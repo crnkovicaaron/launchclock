@@ -11,6 +11,8 @@ RTC_DS1307 rtc;
 uint32_t L_Zero[6] = {2026, 4, 1, 18, 35, 12};
 uint32_t launchTime;
 
+uint32_t CT_Set[6] = {2000, 1, 1, 0, 0, 0}; // for CT set purposes
+
 const uint8_t autoCancel = 10; // time mode autocancel (in seconds)
 const uint32_t blinkInterval = 500; // matrix blink rate in ms (when applicable)
 bool hourMode = false; // Start in day mode
@@ -19,10 +21,12 @@ bool pauseActive = false;
 bool exitPause = false;
 bool showTimeActive = false;
 bool exitShowTime = false;
+bool bypassShowTime = false;
 bool showLDActive = false;
 bool exitShowLD = false;
 bool showLTActive = false;
 bool exitShowLT = false;
+bool CT_Reset = false;
 bool LD_Reset = false;
 bool LT_Reset = false;
 bool resetMatrix = false;
@@ -79,7 +83,7 @@ const uint8_t L_Pause[8] = {
   0b00000001,
   0b11111111
 };
-const uint8_t timeMatrix[8] = {
+const uint8_t CT_Matrix[8] = {
   0b10000000,
   0b11111111,
   0b10000000,
@@ -171,6 +175,10 @@ void errorMode() {
       displayMatrix(ER_Matrix);
       resetMatrix = false;
     }
+    if (key == 'C') {
+      resetCurrentTime();
+      resetMatrix = true;
+    }
     if (key == '*') {
       resetLaunchDate();
       resetMatrix = true;
@@ -212,7 +220,7 @@ bool checkTimeValid(uint32_t T[]) {
 }
 
 void keypadEvent(KeypadEvent key) {
-  if (LT_Reset || LD_Reset || !timeValid) return;
+  if (LT_Reset || LD_Reset || CT_Reset || !timeValid) return;
   switch (keypad.getState()) {
     case PRESSED:
       if (key == 'C' && pauseActive) {
@@ -223,6 +231,10 @@ void keypadEvent(KeypadEvent key) {
       break;
     
     case HOLD:
+      if (key == 'C' && !pauseActive && displayOn && !showTimeActive && !showLDActive && !showLTActive) {
+        resetCurrentTime();
+        bypassShowTime = true;
+      }
       if (key == 'D' && !pauseActive) {
         launchTime = toUnix(L_Zero);
         matrixDisplay.setLed(0, 0, 7, false);
@@ -250,6 +262,7 @@ void keypadEvent(KeypadEvent key) {
       }
       if (key == 'C' && !pauseActive && !showLDActive && !showLTActive) {
         if (exitPause) exitPause = false;
+        else if (bypassShowTime) bypassShowTime = false;
         else if (!showTimeActive) {
           showTime();
         } else {
@@ -301,6 +314,74 @@ void findMode() {
   }
 }
 
+void resetCurrentTime() {
+  CT_Reset = true;
+  displayMatrix(CT_Matrix);
+  for (int i = 0; i < 4; i++) { // turn displays off
+    dispVals[0][i] = 10;
+    dispVals[1][i] = 10;
+    dispDP[0][i] = false;
+    dispDP[1][i] = false;
+  }
+  dispDP[0][3] = true;
+  dispDP[1][1] = true;
+  uint32_t lastBlink = millis();
+  bool matrixOn = true;
+
+  String inpString = "";
+  bool inputDone = false;
+
+  while (!inputDone) {
+    char key = keypad.getKey();
+    if (key) {
+      switch (key) {
+        case '0' ... '9':
+          if (inpString.length() < 6) {
+            inpString += key;
+            showInputPreview(inpString);
+          }
+          break;
+          
+        case 'C':
+          if (inpString.length() == 6) {
+            parseAndSet_CT(inpString);
+            inputDone = true;
+          } else {
+            CT_Reset = false;
+            resetMatrix = true;
+            return;
+            }
+          break;
+
+        case 'D':
+          if (inpString.length() > 0) {
+            inpString.remove(inpString.length() - 1);
+            showInputPreview(inpString);
+          }
+          break;
+      }
+    }    
+    if (millis() - lastBlink >= blinkInterval) {
+      matrixOn = !matrixOn;
+      lastBlink = millis();
+      if (matrixOn) {
+        displayMatrix(CT_Matrix);
+      } else {
+        displayMatrix(matrixOFF);
+      }
+    }
+    refreshDisplays();
+    delay(1);
+  }
+  CT_Reset = false;
+  timeValid = checkTimeValid(CT_Set);
+  if (errorModeActive) return;
+  if (!timeValid) errorMode();
+  countDelayed = false;
+  DateTime newTime(CT_Set[0], CT_Set[1], CT_Set[2], CT_Set[3], CT_Set[4], CT_Set[5]); // create datetime with new time
+  rtc.adjust(newTime);
+  findMode();
+}
 void resetLaunchDate() {
   LD_Reset = true;
   displayMatrix(LD_Matrix);
@@ -439,7 +520,7 @@ void showInputPreview(const String& str) {
   String displayStr = str;
   if (LD_Reset) {
     while (displayStr.length() < 8) displayStr = displayStr + " ";
-  } else if (LT_Reset) {
+  } else if (LT_Reset || CT_Reset) {
     while (displayStr.length() < 6) displayStr = displayStr + " ";
   }
   for (int i = 0; i < 4; i++) {
@@ -449,6 +530,25 @@ void showInputPreview(const String& str) {
   for (int i = 0; i < 4; i++) {
     char c = displayStr[displayStr.length() - 4 + i];
     dispVals[1][i] = (c >= '0' && c <= '9') ? c - '0' : 10;
+  }
+}
+void parseAndSet_CT(const String& s) {
+  if (s.length() < 6) return;
+
+  long newCT[3] = {0, 0, 0};
+
+  newCT[0] = s.substring(0,2).toInt();
+  newCT[1] = s.substring(2,4).toInt();
+  newCT[2] = s.substring(4,6).toInt();
+
+  DateTime now = rtc.now(); // current time on rtc
+
+  // Writing new time to CT_Set (global) for validity verification
+  CT_Set[0] = now.year();
+  CT_Set[1] = now.month();
+  CT_Set[2] = now.day();
+  for (int i = 3; i < 6; i++) {
+    CT_Set[i] = newCT[i-3];
   }
 }
 void parseAndSetL_Zero(const String& s) {
@@ -564,7 +664,7 @@ void showLaunchTime() {
 }
 void showTime() {
   showTimeActive = true;
-  displayMatrix(timeMatrix);
+  displayMatrix(CT_Matrix);
   uint32_t modeStart = millis();
   dispDP[0][0] = false;
   dispDP[0][1] = false;
