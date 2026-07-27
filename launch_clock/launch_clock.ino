@@ -35,18 +35,12 @@ bool countDelayed = false;
 bool timeValid;
 const uint8_t* lastMatrix = nullptr;
 
-const uint8_t rowPins[4] = {53, 52, 51, 50};
-const uint8_t colPins[4] = {49, 48, 47, 46};
-const uint8_t matrixPins[3] = {2, 3, 4};
+const uint8_t DIN_PIN = A0;
+const uint8_t CLK_PIN = A1;
+const uint8_t CS_PIN = A2;
+const uint8_t rowPins[4] = {2, 3, 4, 5};
+const uint8_t colPins[4] = {6, 7, 8, 9};
 
-const uint8_t digitPins[2][4] = {
-  {42, 43, 44, 45},
-  {38, 39, 40, 41}
-};
-const uint8_t segmentPins[2][8] = { // order: a, b, c, d, e, f, g, DP
-  {30, 31, 32, 33, 34, 35, 36, 37},
-  {22, 23, 24, 25, 26, 27, 28, 29}
-};
 const char keys[4][4] = {
   { '1', '2', '3', 'A' },
   { '4', '5', '6', 'B' },
@@ -133,19 +127,6 @@ const uint8_t matrixOFF[8] = {
   0b00000000,
   0b00000000
 };
-const uint8_t segmentPatterns[11][8] = {
-  {1,1,1,1,1,1,0,0}, // 0
-  {0,1,1,0,0,0,0,0}, // 1
-  {1,1,0,1,1,0,1,0}, // 2
-  {1,1,1,1,0,0,1,0}, // 3
-  {0,1,1,0,0,1,1,0}, // 4
-  {1,0,1,1,0,1,1,0}, // 5
-  {1,0,1,1,1,1,1,0}, // 6
-  {1,1,1,0,0,0,0,0}, // 7
-  {1,1,1,1,1,1,1,0}, // 8
-  {1,1,1,0,0,1,1,0}, // 9
-  {0,0,0,0,0,0,0,0}  // 10 = blank
-};
 uint8_t dispVals[2][4] = {
   {0, 0, 0, 0},
   {0, 0, 0, 0}
@@ -154,8 +135,11 @@ bool dispDP[2][4]  = {
   {false, true, false, true},
   {false, true, false, false}
 };
+uint8_t prevDispVals[2][4] = {{11,11,11,11},{11,11,11,11}};  // 11 is impossible value to force initial update
+bool    prevDispDP[2][4]   = {{true,true,true,true},{true,true,true,true}};
+
 Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, 4, 4);
-LedControl matrixDisplay = LedControl(matrixPins[0], matrixPins[2], matrixPins[1]);
+LedControl lc = LedControl(DIN_PIN, CLK_PIN, CS_PIN, 2);
 uint32_t lastUpdate = 0;
 
 
@@ -237,7 +221,7 @@ void keypadEvent(KeypadEvent key) {
       }
       if (key == 'D' && !pauseActive) {
         launchTime = toUnix(L_Zero);
-        matrixDisplay.setLed(0, 0, 7, false);
+        lc.setLed(1, 0, 7, false);
         countDelayed = false;
         exitPause = true;
       }
@@ -371,7 +355,7 @@ void resetCurrentTime() {
       }
     }
     refreshDisplays();
-    delay(1);
+    delay(10);
   }
   CT_Reset = false;
   timeValid = checkTimeValid(CT_Set);
@@ -439,7 +423,7 @@ void resetLaunchDate() {
       }
     }
     refreshDisplays();
-    delay(1);
+    delay(10);
   }
   LD_Reset = false;
   timeValid = checkTimeValid(L_Zero);
@@ -506,7 +490,7 @@ void resetLaunchTime() {
       }
     }
     refreshDisplays();
-    delay(1);
+    delay(10);
   }
   LT_Reset = false;
   timeValid = checkTimeValid(L_Zero);
@@ -797,58 +781,58 @@ void updateHourMode() {
 void displayMatrix(const uint8_t* image) {
   if (image == lastMatrix) return;
   for (uint8_t i = 0; i < 8; i++) {
-    matrixDisplay.setRow(0, i, image[i]);
+    lc.setRow(1, i, image[i]);
   }
   lastMatrix = image;
   if (image == L_Plus || image == L_Minus || image == L_Pause) {
-    matrixDisplay.setLed(0, 0, 7, countDelayed);
+    lc.setLed(1, 0, 7, countDelayed);
   }
 }
 
 void refreshDisplays() {
-  for (uint8_t i = 0; i < 2; i++) {
-    for (uint8_t d = 0; d < 4; d++) {
-      uint8_t num = dispVals[i][d];
-      for (uint8_t s = 0; s < 8; s++) {
-        uint8_t val = segmentPatterns[num][s];
-        if (s == 7 && dispDP[i][d]) val = 1;
-        digitalWrite(segmentPins[i][s], val ? HIGH : LOW);
+  bool changed = false;
+  
+  for (int d = 0; d < 2; d++) {
+    for (int i = 0; i < 4; i++) {
+      if (dispVals[d][i] != prevDispVals[d][i] || 
+          dispDP[d][i] != prevDispDP[d][i]) {
+        
+        if (dispVals[d][i] == 10) {
+          lc.setRow(0, i + 4*d, dispDP[d][i] ? 0x80 : 0x00);   // blank the digit
+        } else {
+          lc.setDigit(0, i + 4*d, dispVals[d][i], dispDP[d][i]);
+        }
+        
+        prevDispVals[d][i] = dispVals[d][i];
+        prevDispDP[d][i]   = dispDP[d][i];
+        changed = true;
       }
-      digitalWrite(digitPins[i][d], LOW);
-      delayMicroseconds(2000);
-      digitalWrite(digitPins[i][d], HIGH);
     }
   }
+  
 }
 
 void setup() {
   // keypad shit
   keypad.addEventListener(keypadEvent);
   keypad.setHoldTime(1500);
-  // matrix shit
-  matrixDisplay.clearDisplay(0);
-  matrixDisplay.shutdown(0, false);
-  matrixDisplay.setIntensity(0, 0.9);
-  // Configure matrix pins
-  pinMode(matrixPins[0], OUTPUT);
-  pinMode(matrixPins[1], OUTPUT);
-  pinMode(matrixPins[2], OUTPUT);
-  digitalWrite(matrixPins[0], LOW);
-  digitalWrite(matrixPins[1], LOW);
-  digitalWrite(matrixPins[2], LOW);
-  // Configure all display pins as outputs
-  for (int i = 0; i < 4; i++) {
-    pinMode(digitPins[0][i], OUTPUT);
-    pinMode(digitPins[1][i], OUTPUT);
-    digitalWrite(digitPins[0][i], HIGH);
-    digitalWrite(digitPins[1][i], HIGH);
-  }
-  for (int i = 0 ; i < 8; i++) {
-    pinMode(segmentPins[0][i], OUTPUT);
-    pinMode(segmentPins[1][i], OUTPUT);
-    digitalWrite(segmentPins[0][i], LOW);
-    digitalWrite(segmentPins[1][i], LOW);
-  }
+  // display shit
+  pinMode(10, OUTPUT);
+  pinMode(11, OUTPUT);
+  pinMode(13, OUTPUT);
+  digitalWrite(10, LOW);
+  digitalWrite(11, LOW);
+  digitalWrite(13, LOW);
+  lc.clearDisplay(0);
+  lc.shutdown(0, false);
+  lc.setIntensity(0, 8);
+  lc.clearDisplay(1);
+  lc.shutdown(1, false);
+  lc.setIntensity(1, 1);
+
+
+  memset(prevDispVals, 11, sizeof(prevDispVals));  // ensure first refreshDisplays() writes everything
+
 
   Wire.begin();
   if (!rtc.begin()) {
