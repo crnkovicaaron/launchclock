@@ -5,7 +5,7 @@
 RTC_DS1307 rtc;
 
 // L-0 time. Format: {Y, M, D, m, S}
-long L_Zero[6] = {2026, 4, 1, 18, 35, 12};
+long L_Zero[6] = {2026, 4, 19, 6, 45, 0};
 uint32_t launchTime;
 
 const uint8_t timeModePin = 10; // time mode LED indicator pin
@@ -13,7 +13,10 @@ const uint8_t pausedPin = 11; // countdown paused LED indicator pin
 const unsigned long autoCancel = 10; // time mode autocancel time (in seconds)
 bool hourMode = false; // Start in day mode
 bool displayOn = true; // Start with display on
-char key; // for keypad
+bool pauseActive = false; 
+bool timeModeActive = false;
+bool exitPause = false;
+bool exitTimeMode = false;
 
 // Keypad pins
 const byte rowPins[4] = {9, 8, 7, 6};
@@ -68,40 +71,66 @@ uint32_t toUnix(long T[]) {
   return(t);
 }
 
-/*
-void resetLaunchDate() {
-  // to be implemented
+void keypadEvent(KeypadEvent key) {
+  switch (keypad.getState()) {
+    case PRESSED:
+      if (key == 'D') {
+        if(!pauseActive) {
+          pauseCountdown();
+        } else {
+          exitPause = true;
+        }
+      }
+      break;
+    case HOLD:
+      break;
+    case RELEASED:
+      if (key == 'A') {
+        displayOn = !displayOn;
+        findMode();
+      }
+      if (key == 'B') {
+        hourMode = !hourMode;
+        findMode();
+      }
+      if (key == 'C') {
+        if (!timeModeActive) {
+          showTime();
+        } else {
+          exitTimeMode = true;
+        }
+      }
+      break;
+    default:
+      break;
+  }
 }
-
-void resetLaunchTime() {
-  displayOn = false;
-  findMode();
-  refreshDisplay1();
-  refreshDisplay2();
-
-}
-*/
 
 void pauseCountdown() {
   DateTime pauseTime = rtc.now();
   if (pauseTime.unixtime() >= launchTime) {
     return;
   }
+  pauseActive = true;
   digitalWrite(pausedPin, HIGH);
-  char k;
+
   do {
-    k = keypad.getKey();
+    keypad.getKey();
     refreshDisplay1();
     refreshDisplay2();
     delay(1);
-  } while (k != 'D');
+  } while (!exitPause);
+  exitPause = false;
+
   DateTime now = rtc.now();
   long pauseDuration = now.unixtime() - pauseTime.unixtime();
   launchTime = launchTime + pauseDuration;
   digitalWrite(pausedPin, LOW);
+  pauseActive = false;
 }
 
 void showTime() {
+  timeModeActive = true;
   unsigned long modeStart = millis();
   digitalWrite(timeModePin, HIGH); // indicator ON
   disp1DP[0] = false;
@@ -114,10 +143,10 @@ void showTime() {
   disp2DP[3] = false;
   disp1Vals[0] = 10;
   disp1Vals[1] = 10;
-  char k;
+  
   do {
     DateTime time = rtc.now();
-    k = keypad.getKey();
+    keypad.getKey();
     uint8_t hour = time.hour();
     uint8_t min = time.minute();
     uint8_t sec = time.second();
@@ -130,8 +159,11 @@ void showTime() {
     refreshDisplay1();
     refreshDisplay2();
     delay(1);
-  } while (k != 'C' && (millis() - modeStart) < (autoCancel*1000));
+  } while (!exitTimeMode && (millis() - modeStart) < (autoCancel * 1000));
+
   digitalWrite(timeModePin, LOW); // indicator OFF
+  timeModeActive = false;
+  exitTimeMode = false;
 }
 
 void findMode() {
@@ -236,9 +268,8 @@ void updateHourMode() {
   disp1Vals[0] = 10;
   disp1Vals[1] = hours / 100;
   if (hours < 100) disp1Vals[1] = 10;
-  disp1Vals[2] = (hours % 100) / 10;
+  disp1Vals[2] = hours / 10;
   disp1Vals[3] = hours % 10;
-
   // Display 2: MM.SS
   disp2Vals[0] = mins / 10;
   disp2Vals[1] = mins % 10;
@@ -276,6 +307,7 @@ void refreshDisplay2() {
 
 void setup() {
   launchTime = toUnix(L_Zero);
+  keypad.addEventListener(keypadEvent);
   // configure LED indicator pins
   pinMode(timeModePin, OUTPUT);
   pinMode(pausedPin, OUTPUT);
@@ -308,25 +340,8 @@ void setup() {
 
 void loop() {
   // keypad shit
-  key = keypad.getKey();
-  switch (keypad.getState()) {
-    case PRESSED:
-      if (key == 'A') {
-        displayOn = !displayOn;
-        findMode();
-      }
-      if (key == 'B') {
-        hourMode = !hourMode;
-        findMode();
-      }
-      if (key == 'C') showTime();
-      if (key == 'D') pauseCountdown();
-      break;
-    case HOLD:
-      break;
-    default:
-      break;
-  }
+  char key = keypad.getKey();
+
   // update mode
   if (millis() - lastUpdate >= 1000) {
     findMode();
