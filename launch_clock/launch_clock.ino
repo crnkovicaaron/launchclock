@@ -4,27 +4,28 @@
 
 RTC_DS1307 rtc;
 
-// Launch time: April 1, 2026 at 18:35:12 EDT
-DateTime launchTime(2026, 4, 1, 18, 35, 12);
+// L-0 time. Format: {Y, M, D, m, S}
+long L_Zero[6] = {2026, 4, 1, 18, 35, 12};
+uint32_t launchTime;
 
-// Start in day mode
-bool hourMode = false;
-//Start with display on
-bool displayOn = true;
-// Keypad shit
-char key;
+const uint8_t timeModePin = 10; // time mode LED indicator pin
+const uint8_t pausedPin = 11; // countdown paused LED indicator pin
+const unsigned long autoCancel = 10; // time mode autocancel time (in seconds)
+bool hourMode = false; // Start in day mode
+bool displayOn = true; // Start with display on
+char key; // for keypad
 
 // Keypad pins
-const byte rowPins[4] = { 9, 8, 7, 6 };
-const byte colPins[4] = { 5, 4, 3, 2 };
+const byte rowPins[4] = {9, 8, 7, 6};
+const byte colPins[4] = {5, 4, 3, 2};
 
 // Display 1 pins (DD.HH.)
-const int digitPins1[] = {42, 43, 44, 45};
-const int segmentPins1[] = {30, 31, 32, 33, 34, 35, 36, 37}; // order: a, b, c, d, e, f, g, DP
+const uint8_t digitPins1[] = {42, 43, 44, 45};
+const uint8_t segmentPins1[] = {30, 31, 32, 33, 34, 35, 36, 37}; // order: a, b, c, d, e, f, g, DP
 
 // Display 2 pins (MM.SS)
-const int digitPins2[] = {38, 39, 40, 41};
-const int segmentPins2[] = {22, 23, 24, 25, 26, 27, 28, 29}; // order: a, b, c, d, e, f, g, DP
+const uint8_t digitPins2[] = {38, 39, 40, 41};
+const uint8_t segmentPins2[] = {22, 23, 24, 25, 26, 27, 28, 29}; // order: a, b, c, d, e, f, g, DP
 
 // Defining keypad buttons
 const char keys[4][4] = {
@@ -53,13 +54,85 @@ const byte segmentPatterns[11][8] = {
 Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, 4, 4);
 
 // Current values to display (updated from RTC every second) (default is day mode)
-int disp1Vals[4] = {0, 0, 0, 0};     // DDHH
+uint8_t disp1Vals[4] = {0, 0, 0, 0};     // DDHH
 bool disp1DP[4]  = {false, true, false, true};  // DD.HH.
 
-int disp2Vals[4] = {0, 0, 0, 0};     // MMSS
+uint8_t disp2Vals[4] = {0, 0, 0, 0};     // MMSS
 bool disp2DP[4]  = {false, true, false, false}; // MM.SS
 
 unsigned long lastUpdate = 0;
+
+uint32_t toUnix(long T[]) {
+  DateTime launch(T[0], T[1], T[2], T[3], T[4], T[5]);
+  uint32_t t = launch.unixtime();
+  return(t);
+}
+
+/*
+void resetLaunchDate() {
+  // to be implemented
+}
+
+void resetLaunchTime() {
+  displayOn = false;
+  findMode();
+  refreshDisplay1();
+  refreshDisplay2();
+
+}
+*/
+
+void pauseCountdown() {
+  DateTime pauseTime = rtc.now();
+  if (pauseTime.unixtime() >= launchTime) {
+    return;
+  }
+  digitalWrite(pausedPin, HIGH);
+  char k;
+  do {
+    k = keypad.getKey();
+    refreshDisplay1();
+    refreshDisplay2();
+    delay(1);
+  } while (k != 'D');
+  DateTime now = rtc.now();
+  long pauseDuration = now.unixtime() - pauseTime.unixtime();
+  launchTime = launchTime + pauseDuration;
+  digitalWrite(pausedPin, LOW);
+}
+
+void showTime() {
+  unsigned long modeStart = millis();
+  digitalWrite(timeModePin, HIGH); // indicator ON
+  disp1DP[0] = false;
+  disp1DP[1] = false;
+  disp1DP[2] = false;
+  disp1DP[3] = true;
+  disp2DP[0] = false;
+  disp2DP[1] = true;
+  disp2DP[2] = false;
+  disp2DP[3] = false;
+  disp1Vals[0] = 10;
+  disp1Vals[1] = 10;
+  char k;
+  do {
+    DateTime time = rtc.now();
+    k = keypad.getKey();
+    uint8_t hour = time.hour();
+    uint8_t min = time.minute();
+    uint8_t sec = time.second();
+    disp1Vals[2] = hour / 10;
+    disp1Vals[3] = hour % 10;
+    disp2Vals[0] = min / 10;
+    disp2Vals[1] = min % 10;
+    disp2Vals[2] = sec / 10;
+    disp2Vals[3] = sec % 10;
+    refreshDisplay1();
+    refreshDisplay2();
+    delay(1);
+  } while (k != 'C' && (millis() - modeStart) < (autoCancel*1000));
+  digitalWrite(timeModePin, LOW); // indicator OFF
+}
 
 void findMode() {
   if (displayOn == false) {
@@ -87,8 +160,14 @@ void updateDayMode() {
   disp2DP[3] = false;
 
   DateTime now = rtc.now();
-  long diff = now.unixtime() - launchTime.unixtime();
-  if (diff < 0) diff = launchTime.unixtime() - now.unixtime();
+  uint32_t nowUnix = now.unixtime();
+
+  uint32_t diff;
+  if (nowUnix < launchTime) {
+    diff = launchTime - nowUnix;   // still counting down (L-)
+  } else {
+    diff = nowUnix - launchTime;   // counting up (T+) or at zero
+  }
 
   long days  = diff / 86400;
   long hours = (diff % 86400) / 3600;
@@ -107,7 +186,7 @@ void updateDayMode() {
   disp1Vals[0] = days / 10;
   if (days < 10) disp1Vals[0] = 10;
   disp1Vals[1] = days % 10;
-  if (days = 0) {
+  if (days == 0) {
     disp1Vals[1] = 10;
     disp1DP[1] = false;
   }
@@ -133,8 +212,14 @@ void updateHourMode() {
   disp2DP[3] = false;
 
   DateTime now = rtc.now();
-  long diff = now.unixtime() - launchTime.unixtime();
-  if (diff < 0) diff = launchTime.unixtime() - now.unixtime();
+  uint32_t nowUnix = now.unixtime();
+
+  uint32_t diff;
+  if (nowUnix < launchTime) {
+    diff = launchTime - nowUnix;   // still counting down (L-)
+  } else {
+    diff = nowUnix - launchTime;   // counting up (T+) or at zero
+  }
 
   long hours = diff / 3600;
   int mins   = (diff % 3600) / 60;
@@ -190,17 +275,23 @@ void refreshDisplay2() {
 }
 
 void setup() {
+  launchTime = toUnix(L_Zero);
+  // configure LED indicator pins
+  pinMode(timeModePin, OUTPUT);
+  pinMode(pausedPin, OUTPUT);
+  digitalWrite(timeModePin, LOW);
+  digitalWrite(pausedPin, LOW);
   // Configure all display pins as outputs
   for (int i = 0; i < 4; i++) {
     pinMode(digitPins1[i], OUTPUT);
     pinMode(digitPins2[i], OUTPUT);
-    digitalWrite(digitPins1[i], HIGH);   // digits off initially (common cathode)
+    digitalWrite(digitPins1[i], HIGH);
     digitalWrite(digitPins2[i], HIGH);
   }
   for (int i = 0 ; i < 8; i++) {
     pinMode(segmentPins1[i], OUTPUT);
     pinMode(segmentPins2[i], OUTPUT);
-    digitalWrite(segmentPins1[i], LOW);  // segments off
+    digitalWrite(segmentPins1[i], LOW);
     digitalWrite(segmentPins2[i], LOW);
   }
 
@@ -211,40 +302,37 @@ void setup() {
   }
   // rtc.adjust(DateTime(F(__DATE__), F(__TIME__))); // ← uncomment ONLY if you need to set the RTC once
 
-  // Force an immediate first update so the display isn't blank at startup
   updateDayMode();
   lastUpdate = millis();
 }
 
 void loop() {
-  // keypad logic
+  // keypad shit
   key = keypad.getKey();
-  switch (key) {
-    case 'A':
-      displayOn = !displayOn;
-      findMode();
+  switch (keypad.getState()) {
+    case PRESSED:
+      if (key == 'A') {
+        displayOn = !displayOn;
+        findMode();
+      }
+      if (key == 'B') {
+        hourMode = !hourMode;
+        findMode();
+      }
+      if (key == 'C') showTime();
+      if (key == 'D') pauseCountdown();
       break;
-    case 'B':
-      hourMode = !hourMode;
-      findMode();
-      break;
-    case 'C':
-      //  pauseCountdown();
-      break;
-    case 'D':
-      // resetLaunchTime();
+    case HOLD:
       break;
     default:
-    break;
+      break;
   }
-
   // update mode
   if (millis() - lastUpdate >= 1000) {
     findMode();
     lastUpdate = millis();
   }
 
-  // Continuously multiplex both displays
   refreshDisplay1();
   refreshDisplay2();
 }
