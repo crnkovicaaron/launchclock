@@ -3,11 +3,12 @@
 #include <Keypad.h>
 #include <LedControl.h>
 #include "set.h"
+#include <EEPROM.h>
 
 RTC_DS1307 rtc;
 
 // L-0 time. Format: {Y, M, D, h, m, s}
-uint32_t L_Zero[6] = {2026, 4, 27, 10, 21, 0};
+uint32_t L_Zero[6] = {2026, 4, 1, 18, 35, 12};
 uint32_t launchTime;
 
 const uint8_t autoCancel = 10; // time mode autocancel (in seconds)
@@ -26,6 +27,7 @@ bool LD_Reset = false;
 bool LT_Reset = false;
 bool resetMatrix = false;
 bool errorModeActive = false;
+bool countDelayed = false;
 bool timeValid;
 const uint8_t* lastMatrix = nullptr;
 
@@ -202,6 +204,7 @@ bool checkTimeValid(uint32_t T[]) {
       if (T[2] > 28) return false;
     }
   }
+  if (T[2] < 1) return false;
   if (T[3] > 23) return false;
   if (T[4] > 59) return false;
   if (T[5] > 59) return false;
@@ -212,12 +215,18 @@ void keypadEvent(KeypadEvent key) {
   if (LT_Reset || LD_Reset || !timeValid) return;
   switch (keypad.getState()) {
     case PRESSED:
+      if (key == 'C' && pauseActive) {
+        pauseActive = false;
+        exitPause = true;
+      }
       if (key == 'D' && pauseActive) exitPause = true;
       break;
     
     case HOLD:
       if (key == 'D' && !pauseActive) {
         launchTime = toUnix(L_Zero);
+        matrixDisplay.setLed(0, 0, 7, false);
+        countDelayed = false;
         exitPause = true;
       }
       if (key == '#' && !pauseActive && displayOn && !showTimeActive && !showLDActive && !showLTActive) {
@@ -240,7 +249,8 @@ void keypadEvent(KeypadEvent key) {
         findMode();
       }
       if (key == 'C' && !pauseActive && !showLDActive && !showLTActive) {
-        if (!showTimeActive) {
+        if (exitPause) exitPause = false;
+        else if (!showTimeActive) {
           showTime();
         } else {
           exitShowTime = true;
@@ -253,7 +263,7 @@ void keypadEvent(KeypadEvent key) {
           pauseActive = false;
         } 
       }
-      if (key == '*' && !pauseActive && !showLTActive) {
+      if (key == '*' && !pauseActive && !showTimeActive) {
         if (!showLDActive && !exitShowLD) {
           showLaunchDate();
         } else if (showLDActive && !exitShowLD) exitShowLD = true;
@@ -262,7 +272,7 @@ void keypadEvent(KeypadEvent key) {
           exitShowLD = false;
         }
       }
-      if (key == '#' && !pauseActive && !showLDActive) {
+      if (key == '#' && !pauseActive && !showTimeActive) {
         if (!showLTActive && !exitShowLT) {
           showLaunchTime();
         } else if (showLTActive && !exitShowLT) exitShowLT = true;
@@ -355,6 +365,7 @@ void resetLaunchDate() {
   if (errorModeActive) return;
   if (!timeValid) errorMode();
   launchTime = toUnix(L_Zero);
+  countDelayed = false;
   findMode();
 }
 void resetLaunchTime() {
@@ -421,6 +432,7 @@ void resetLaunchTime() {
   if (errorModeActive) return;
   if (!timeValid) errorMode();
   launchTime = toUnix(L_Zero);
+  countDelayed = false;
   findMode();
 }
 void showInputPreview(const String& str) {
@@ -454,8 +466,16 @@ void parseAndSetL_Zero(const String& s) {
     newLZero[1] = s.substring(4,6).toInt();
     newLZero[2] = s.substring(6,8).toInt();
   }
+  bool changed = false;
   for (int i = 0; i < 6; i++) {
-    if (newLZero[i] != -1)  L_Zero[i] = newLZero[i];
+    if (newLZero[i] != -1 && newLZero[i] != L_Zero[i]) {
+      L_Zero[i] = newLZero[i];
+      changed = true;
+    }
+  }
+
+  if (changed) {
+    EEPROM.put(0, L_Zero);
   }
 }
 
@@ -471,9 +491,11 @@ void pauseCountdown() {
     refreshDisplays();
     delay(1);
   } while (!exitPause);
+  if (!pauseActive) return;
   DateTime now = rtc.now();
   long pauseDuration = now.unixtime() - pauseTime.unixtime();
   launchTime = launchTime + pauseDuration;
+  countDelayed = true;
 }
 
 void showLaunchDate() {
@@ -678,6 +700,9 @@ void displayMatrix(const uint8_t* image) {
     matrixDisplay.setRow(0, i, image[i]);
   }
   lastMatrix = image;
+  if (image == L_Plus || image == L_Minus || image == L_Pause) {
+    matrixDisplay.setLed(0, 0, 7, countDelayed);
+  }
 }
 
 void refreshDisplays() {
@@ -729,17 +754,26 @@ void setup() {
   if (!rtc.begin()) {
     while (1) delay(10);
   }
-  // rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 
+  uint32_t savedLZero[6];
+  EEPROM.get(0, savedLZero);
+  if (savedLZero[0] >= 2000 && savedLZero[0] <= 2100) {
+    for (int i = 0; i < 6; i++) {
+      L_Zero[i] = savedLZero[i];
+    }
+  }
   timeValid = checkTimeValid(L_Zero);
-  if (!timeValid) errorMode;
+  if (!timeValid) errorMode();
   launchTime = toUnix(L_Zero);
+
+  // rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+  
   updateDayMode();
   lastUpdate = millis();
 }
 
 void loop() {
-  char key = keypad.getKey();
+  keypad.getKey();
   if (millis() - lastUpdate >= 1000) {
     findMode();
     lastUpdate = millis();
