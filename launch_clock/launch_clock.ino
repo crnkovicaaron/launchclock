@@ -15,6 +15,7 @@ uint32_t CT_Set[6] = {2000, 1, 1, 0, 0, 0}; // for CT set purposes
 
 const uint8_t autoCancel = 10; // time mode autocancel (in seconds)
 const uint32_t blinkInterval = 500; // matrix blink rate in ms (when applicable)
+uint8_t brightnessMode = 1; // initial brightness mode
 bool hourMode = false; // Start in day mode
 bool displayOn = true; // Start with display on
 bool pauseActive = false;
@@ -32,6 +33,7 @@ bool LT_Reset = false;
 bool resetMatrix = false;
 bool errorModeActive = false;
 bool countDelayed = false;
+bool bypass = false;
 bool timeValid;
 const uint8_t* lastMatrix = nullptr;
 
@@ -47,6 +49,7 @@ const char keys[4][4] = {
   { '7', '8', '9', 'C' },
   { '*', '0', '#', 'D' }
 };
+const uint8_t displayIntensity[3][2] = {{2,0.9},{8,2},{15,5}}; // for brightnessMode 0,1,2
 const uint8_t L_Plus[8] = {
   0b10000000,
   0b10000000,
@@ -136,7 +139,7 @@ bool dispDP[2][4]  = {
   {false, true, false, false}
 };
 uint8_t prevDispVals[2][4] = {{11,11,11,11},{11,11,11,11}};  // 11 to force initial update
-bool    prevDispDP[2][4]   = {{true,true,true,true},{true,true,true,true}};
+bool prevDispDP[2][4]   = {{true,true,true,true},{true,true,true,true}};
 
 Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, 4, 4);
 LedControl lc = LedControl(DIN_PIN, CLK_PIN, CS_PIN, 2);
@@ -148,10 +151,10 @@ void errorMode() {
   displayMatrix(ER_Matrix);
   resetMatrix = false;
   for (int i = 0; i < 4; i++) {
-  dispVals[0][i] = 10;
-  dispVals[1][i] = 10;
-  dispDP[0][i] = false;
-  dispDP[1][i] = false;
+    dispVals[0][i] = 10;
+    dispVals[1][i] = 10;
+    dispDP[0][i] = false;
+    dispDP[1][i] = false;
   }
   refreshDisplays();
   do {
@@ -216,6 +219,11 @@ void keypadEvent(KeypadEvent key) {
       break;
     
     case HOLD:
+      if (key == 'A' && !pauseActive && !showTimeActive && !showLDActive && !showLTActive) {
+        displayOn = !displayOn;
+        bypass = true;
+        findMode();
+      }
       if (key == 'C' && !pauseActive && displayOn && !showTimeActive && !showLDActive && !showLTActive) {
         resetCurrentTime();
         bypassShowTime = true;
@@ -225,6 +233,7 @@ void keypadEvent(KeypadEvent key) {
         lc.setLed(1, 7, 7, false);
         countDelayed = false;
         exitPause = true;
+        findMode();
       }
       if (key == '#' && !pauseActive && displayOn && !showTimeActive && !showLDActive && !showLTActive) {
         resetLaunchTime();
@@ -237,13 +246,24 @@ void keypadEvent(KeypadEvent key) {
       break;
     
     case RELEASED:
-      if (key == 'A' && !pauseActive && !showTimeActive && !showLDActive && !showLTActive) {
-        displayOn = !displayOn;
-        findMode();
+      if (key == 'A' && !pauseActive && !showTimeActive && !showLDActive && !showLTActive && displayOn) {
+        if (exitShowLD) {
+        exitShowLD = false;
+        } else {
+          if (bypass) bypass = false;
+          else {
+            brightnessMode++;
+            if (brightnessMode == 3) brightnessMode = 0;
+            for (int i = 0; i < 2; i++) {
+              lc.setIntensity(i, displayIntensity[brightnessMode][i]);
+            }
+          findMode();
+          }
+        }
       }
       if (key == 'B' && !pauseActive && !showTimeActive && !showLDActive && !showLTActive) {
-        hourMode = !hourMode;
-        findMode();
+      hourMode = !hourMode;
+      findMode();
       }
       if (key == 'C' && !pauseActive && !showLDActive && !showLTActive) {
         if (exitPause) exitPause = false;
@@ -375,6 +395,7 @@ void resetCurrentTime() {
 }
 void resetLaunchDate() {
   LD_Reset = true;
+  bool validity;
   displayMatrix(LD_Matrix);
   for (int i = 0; i < 4; i++) {
     dispVals[0][i] = 10;
@@ -400,6 +421,26 @@ void resetLaunchDate() {
             showInputPreview(inpString);
           }
           break;
+        
+        case 'A':
+          ++L_Zero[2];
+          validity = checkTimeValid(L_Zero);
+          if (!validity) {
+            L_Zero[2] = 1;
+            ++L_Zero[1];
+          }
+          validity = checkTimeValid(L_Zero);
+          if (!validity) {
+            L_Zero[1] = 1;
+            ++L_Zero[0];
+          }
+          validity = checkTimeValid(L_Zero);
+          if (!validity) errorMode();
+          EEPROM.put(0, L_Zero);
+          launchTime = toUnix(L_Zero);
+          LD_Reset = false;
+          resetMatrix = true;
+          return;
           
         case '*':
           if (inpString.length() == 8) {
@@ -834,7 +875,7 @@ void setup() {
   lc.setIntensity(0, 8);
   lc.clearDisplay(1);
   lc.shutdown(1, false);
-  lc.setIntensity(1, 1);
+  lc.setIntensity(1, 2);
 
 
   memset(prevDispVals, 11, sizeof(prevDispVals));  // ensure first refreshDisplays() writes everything
