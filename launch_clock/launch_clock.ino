@@ -1,28 +1,37 @@
 #include <Wire.h>
 #include <RTClib.h>
 #include <Keypad.h>
-#include "LedControl.h"
+#include <LedControl.h>
+#include "set.h"
 
 RTC_DS1307 rtc;
 
 // L-0 time. Format: {Y, M, D, h, m, s}
-long L_Zero[6] = {2026, 4, 22, 0, 0, 0};
+uint32_t L_Zero[6] = {2026, 4, 27, 10, 21, 0};
 uint32_t launchTime;
 
-const unsigned long autoCancel = 10; // time mode autocancel (in seconds)
+const uint8_t autoCancel = 10; // time mode autocancel (in seconds)
+const uint32_t blinkInterval = 500; // matrix blink rate (when applicable)
 bool hourMode = false; // Start in day mode
 bool displayOn = true; // Start with display on
-bool pauseActive = false; 
-bool timeModeActive = false;
+bool pauseActive = false;
 bool exitPause = false;
-bool exitTimeMode = false;
+bool showTimeActive = false;
+bool exitShowTime = false;
+bool showLDActive = false;
+bool exitShowLD = false;
+bool showLTActive = false;
+bool exitShowLT = false;
 bool LD_Reset = false;
 bool LT_Reset = false;
+bool resetMatrix = false;
+bool errorModeActive = false;
+bool timeValid;
 const uint8_t* lastMatrix = nullptr;
 
 const uint8_t rowPins[4] = {53, 52, 51, 50};
 const uint8_t colPins[4] = {49, 48, 47, 46};
-const int matrixPins[3] = {A8, A9, A10};
+const uint8_t matrixPins[3] = {A8, A9, A10};
 
 const uint8_t digitPins[2][4] = {
   {42, 43, 44, 45},
@@ -98,6 +107,16 @@ const uint8_t LD_Matrix[8] = {
   0b00000001,
   0b11111111
 };
+const uint8_t ER_Matrix[8] = {
+  0b11100111,
+  0b10011000,
+  0b10010000,
+  0b11111111,
+  0b00000000,
+  0b10001001,
+  0b10001001,
+  0b11111111
+};
 const uint8_t matrixOFF[8] = {
   0b00000000,
   0b00000000,
@@ -108,7 +127,6 @@ const uint8_t matrixOFF[8] = {
   0b00000000,
   0b00000000
 };
-uint8_t segmentBytes[2][11][2];
 const uint8_t segmentPatterns[11][8] = {
   {1,1,1,1,1,1,0,0}, // 0
   {0,1,1,0,0,0,0,0}, // 1
@@ -132,35 +150,66 @@ bool dispDP[2][4]  = {
 };
 Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, 4, 4);
 LedControl matrixDisplay = LedControl(matrixPins[0], matrixPins[2], matrixPins[1]);
-unsigned long lastUpdate = 0;
+uint32_t lastUpdate = 0;
 
 
-uint32_t toUnix(long T[]) {
+void errorMode() {
+  errorModeActive = true;
+  displayMatrix(ER_Matrix);
+  resetMatrix = false;
+  for (int i = 0; i < 4; i++) {
+  dispVals[0][i] = 10;
+  dispVals[1][i] = 10;
+  dispDP[0][i] = false;
+  dispDP[1][i] = false;
+  }
+  do {
+    char key = keypad.getKey();
+    if (resetMatrix) {
+      displayMatrix(ER_Matrix);
+      resetMatrix = false;
+    }
+    if (key == '*') {
+      resetLaunchDate();
+      resetMatrix = true;
+    }
+    if (key == '#') {
+      resetLaunchTime();
+      resetMatrix = true;
+    }
+    delay(1);
+  } while (!timeValid);
+  errorModeActive = false;
+}
+uint32_t toUnix(uint32_t T[]) {
   DateTime launch(T[0], T[1], T[2], T[3], T[4], T[5]);
   uint32_t t = launch.unixtime();
   return(t);
 }
-void initSegmentBytes() {
-  for (uint8_t i = 0; i < 2; i++) {
-    for (uint8_t n = 0; n < 11; n++) {
-      for (uint8_t dp = 0; dp < 2; dp++) {
-        uint8_t val = 0;
-        for (uint8_t s = 0; s < 8; s++) {
-          uint8_t bit = segmentPatterns[n][s];
-          if (s == 7 && dp) bit = 1;               // DP override
-          if (bit) {
-            if (i == 0) val |= (1 << (7 - s));     // PORTC (reversed)
-            else        val |= (1 << s);           // PORTA (normal)
-          }
-        }
-        segmentBytes[i][n][dp] = val;
-      }
+bool checkTimeValid(uint32_t T[]) {
+  if (T[0] < 2000 || T[0] > 2100) return false;
+  if (T[1] < 1 || T[1] > 12) return false;
+  Set maxMonths;
+  maxMonths.add(1); maxMonths.add(3); maxMonths.add(5); maxMonths.add(7); maxMonths.add(8); maxMonths.add(10); maxMonths.add(12);
+  if (maxMonths.has(T[1])) {
+    if (T[2] > 31) return false;
+  } else if (T[1] != 2) {
+    if (T[2] > 30) return false;
+  } else {
+    if (T[0] % 400 == 0 || (T[0] % 4 == 0 && T[0] % 100 != 0)) {
+      if (T[2] > 29) return false;
+    } else {
+      if (T[2] > 28) return false;
     }
   }
+  if (T[3] > 23) return false;
+  if (T[4] > 59) return false;
+  if (T[5] > 59) return false;
+  return true;
 }
 
 void keypadEvent(KeypadEvent key) {
-  if (LT_Reset || LD_Reset) return;
+  if (LT_Reset || LD_Reset || !timeValid) return;
   switch (keypad.getState()) {
     case PRESSED:
       if (key == 'D' && pauseActive) exitPause = true;
@@ -171,36 +220,74 @@ void keypadEvent(KeypadEvent key) {
         launchTime = toUnix(L_Zero);
         exitPause = true;
       }
-      if (key == '#') resetLaunchTime();
-      if (key == '*') resetLaunchDate();
+      if (key == '#' && !pauseActive && displayOn && !showTimeActive && !showLDActive && !showLTActive) {
+        resetLaunchTime();
+        exitShowLT = true;
+      }
+      if (key == '*' && !pauseActive && displayOn && !showTimeActive && !showLDActive && !showLTActive) {
+        resetLaunchDate();
+        exitShowLD = true;
+      }
       break;
     
     case RELEASED:
-      if (key == 'A') {
+      if (key == 'A' && !pauseActive && !showTimeActive && !showLDActive && !showLTActive) {
         displayOn = !displayOn;
         findMode();
       }
-      if (key == 'B') {
+      if (key == 'B' && !pauseActive && !showTimeActive && !showLDActive && !showLTActive) {
         hourMode = !hourMode;
         findMode();
       }
-      if (key == 'C') {
-        if (!timeModeActive) {
+      if (key == 'C' && !pauseActive && !showLDActive && !showLTActive) {
+        if (!showTimeActive) {
           showTime();
         } else {
-          exitTimeMode = true;
+          exitShowTime = true;
         }
       }
       if (key == 'D') {
-        if (!pauseActive && !exitPause) pauseCountdown();
+        if (!pauseActive && !exitPause && !showTimeActive && !showLDActive && !showLTActive && displayOn) pauseCountdown();
         else {
           exitPause = false;
           pauseActive = false;
+        } 
+      }
+      if (key == '*' && !pauseActive && !showLTActive) {
+        if (!showLDActive && !exitShowLD) {
+          showLaunchDate();
+        } else if (showLDActive && !exitShowLD) exitShowLD = true;
+        else {
+          showLDActive = false;
+          exitShowLD = false;
+        }
+      }
+      if (key == '#' && !pauseActive && !showLDActive) {
+        if (!showLTActive && !exitShowLT) {
+          showLaunchTime();
+        } else if (showLTActive && !exitShowLT) exitShowLT = true;
+        else {
+          showLTActive = false;
+          exitShowLT = false;
         }
       }
       break;
     default:
       break;
+  }
+}
+void findMode() {
+  if (displayOn == false) {
+    displayMatrix(matrixOFF);
+    for (int i = 0; i < 4; i++) {
+      dispVals[0][i] = 10;
+      dispVals[1][i] = 10;
+      dispDP[0][i] = false;
+      dispDP[1][i] = false;
+    }
+  } else {
+    if (hourMode == false) updateDayMode();
+    if (hourMode == true) updateHourMode();
   }
 }
 
@@ -215,8 +302,7 @@ void resetLaunchDate() {
   }
   dispDP[0][3] = true;
   dispDP[1][1] = true;
-  unsigned long lastBlink = millis();
-  const unsigned long blinkInterval = 500;
+  uint32_t lastBlink = millis();
   bool matrixOn = true;
 
   String inpString = "";
@@ -235,10 +321,11 @@ void resetLaunchDate() {
           
         case '*':
           if (inpString.length() == 8) {
-            parseAndSetLaunchTime(inpString);
+            parseAndSetL_Zero(inpString);
             inputDone = true;
           } else {
             LD_Reset = false;
+            resetMatrix = true;
             return;
           }
           break;
@@ -251,22 +338,23 @@ void resetLaunchDate() {
           break;
       }
     }
-
     if (millis() - lastBlink >= blinkInterval) {
       matrixOn = !matrixOn;
       lastBlink = millis();
-
       if (matrixOn) {
         displayMatrix(LD_Matrix);
       } else {
         displayMatrix(matrixOFF);
       }
     }
-
     refreshDisplays();
     delay(1);
   }
   LD_Reset = false;
+  timeValid = checkTimeValid(L_Zero);
+  if (errorModeActive) return;
+  if (!timeValid) errorMode();
+  launchTime = toUnix(L_Zero);
   findMode();
 }
 void resetLaunchTime() {
@@ -280,8 +368,7 @@ void resetLaunchTime() {
   }
   dispDP[0][3] = true;
   dispDP[1][1] = true;
-  unsigned long lastBlink = millis();
-  const unsigned long blinkInterval = 500;
+  uint32_t lastBlink = millis();
   bool matrixOn = true;
   
   String inpString = "";
@@ -300,11 +387,13 @@ void resetLaunchTime() {
           
         case '#':
           if (inpString.length() == 6) {
-            parseAndSetLaunchTime(inpString);
+            parseAndSetL_Zero(inpString);
             inputDone = true;
           } else {
             LT_Reset = false;
-            return;}
+            resetMatrix = true;
+            return;
+            }
           break;
 
         case 'D':
@@ -315,22 +404,23 @@ void resetLaunchTime() {
           break;
       }
     }
-
     if (millis() - lastBlink >= blinkInterval) {
       matrixOn = !matrixOn;
       lastBlink = millis();
-
       if (matrixOn) {
         displayMatrix(LT_Matrix);
       } else {
         displayMatrix(matrixOFF);
       }
     }
-
     refreshDisplays();
     delay(1);
   }
   LT_Reset = false;
+  timeValid = checkTimeValid(L_Zero);
+  if (errorModeActive) return;
+  if (!timeValid) errorMode();
+  launchTime = toUnix(L_Zero);
   findMode();
 }
 void showInputPreview(const String& str) {
@@ -339,10 +429,7 @@ void showInputPreview(const String& str) {
     while (displayStr.length() < 8) displayStr = displayStr + " ";
   } else if (LT_Reset) {
     while (displayStr.length() < 6) displayStr = displayStr + " ";
-  } else {
-    while (displayStr.length() < 8) displayStr = " " + displayStr;
   }
-
   for (int i = 0; i < 4; i++) {
     char c = displayStr[displayStr.length() - 8 + i];
     dispVals[0][i] = (c >= '0' && c <= '9') ? c - '0' : 10;
@@ -352,7 +439,7 @@ void showInputPreview(const String& str) {
     dispVals[1][i] = (c >= '0' && c <= '9') ? c - '0' : 10;
   }
 }
-void parseAndSetLaunchTime(const String& s) {
+void parseAndSetL_Zero(const String& s) {
   if (s.length() < 6) return;
   
   long newLZero[6] = {-1, -1, -1, -1, -1, -1};
@@ -367,12 +454,9 @@ void parseAndSetLaunchTime(const String& s) {
     newLZero[1] = s.substring(4,6).toInt();
     newLZero[2] = s.substring(6,8).toInt();
   }
-
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < 6; i++) {
     if (newLZero[i] != -1)  L_Zero[i] = newLZero[i];
   }
-
-  launchTime = toUnix(L_Zero);
 }
 
 void pauseCountdown() {
@@ -392,10 +476,74 @@ void pauseCountdown() {
   launchTime = launchTime + pauseDuration;
 }
 
+void showLaunchDate() {
+  showLDActive = true;
+  displayMatrix(LD_Matrix);
+  uint32_t modeStart = millis();
+  dispDP[0][0] = false;
+  dispDP[0][1] = false;
+  dispDP[0][2] = false;
+  dispDP[0][3] = true;
+  dispDP[1][0] = false;
+  dispDP[1][1] = true;
+  dispDP[1][2] = false;
+  dispDP[1][3] = false;
+  dispVals[0][0] = 10;
+  dispVals[0][1] = 10;
+  uint32_t year = L_Zero[0];
+  uint8_t month = L_Zero[1];
+  uint8_t day = L_Zero[2];
+  dispVals[0][0] = year / 1000;
+  dispVals[0][1] = (year % 1000) / 100;
+  dispVals[0][2] = (year % 100) / 10;
+  dispVals[0][3] = year % 10;
+  dispVals[1][0] = month / 10;
+  dispVals[1][1] = month % 10;
+  dispVals[1][2] = day / 10;
+  dispVals[1][3] = day % 10;
+  do {
+    keypad.getKey();
+    refreshDisplays();
+    delay(1);
+  } while (!exitShowLD && (millis() - modeStart) < (autoCancel * 1000));
+  showLDActive = false;
+  exitShowLD = false;
+}
+void showLaunchTime() {
+  showLTActive = true;
+  displayMatrix(LT_Matrix);
+  uint32_t modeStart = millis();
+  dispDP[0][0] = false;
+  dispDP[0][1] = false;
+  dispDP[0][2] = false;
+  dispDP[0][3] = true;
+  dispDP[1][0] = false;
+  dispDP[1][1] = true;
+  dispDP[1][2] = false;
+  dispDP[1][3] = false;
+  dispVals[0][0] = 10;
+  dispVals[0][1] = 10;
+  uint32_t hour = L_Zero[3];
+  uint8_t minute = L_Zero[4];
+  uint8_t second = L_Zero[5];
+  dispVals[0][2] = hour / 10;
+  dispVals[0][3] = hour % 10;
+  dispVals[1][0] = minute / 10;
+  dispVals[1][1] = minute % 10;
+  dispVals[1][2] = second / 10;
+  dispVals[1][3] = second % 10;
+  do {
+    keypad.getKey();
+    refreshDisplays();
+    delay(1);
+  } while (!exitShowLT && (millis() - modeStart) < (autoCancel * 1000));
+  showLTActive = false;
+  exitShowLT = false;
+}
 void showTime() {
-  timeModeActive = true;
+  showTimeActive = true;
   displayMatrix(timeMatrix);
-  unsigned long modeStart = millis();
+  uint32_t modeStart = millis();
   dispDP[0][0] = false;
   dispDP[0][1] = false;
   dispDP[0][2] = false;
@@ -420,24 +568,9 @@ void showTime() {
     dispVals[1][3] = sec % 10;
     refreshDisplays();
     delay(1);
-  } while (!exitTimeMode && (millis() - modeStart) < (autoCancel * 1000));
-  timeModeActive = false;
-  exitTimeMode = false;
-}
-
-void findMode() {
-  if (displayOn == false) {
-    displayMatrix(matrixOFF);
-    for (int i = 0; i < 4; i++) {
-      dispVals[0][i] = 10;
-      dispVals[1][i] = 10;
-      dispDP[0][i] = false;
-      dispDP[1][i] = false;
-    }
-  } else {
-    if (hourMode == false) updateDayMode();
-    if (hourMode == true) updateHourMode();
-  }
+  } while (!exitShowTime && (millis() - modeStart) < (autoCancel * 1000));
+  showTimeActive = false;
+  exitShowTime = false;
 }
 
 void updateDayMode() {
@@ -530,12 +663,13 @@ void updateHourMode() {
   dispVals[0][0] = 10;
   dispVals[0][1] = hours / 100;
   if (hours < 100) dispVals[0][1] = 10;
-  dispVals[0][2] = hours / 10;
+  dispVals[0][2] = (hours / 10) % 10;
   dispVals[0][3] = hours % 10;
   dispVals[1][0] = mins / 10;
   dispVals[1][1] = mins % 10;
   dispVals[1][2] = secs / 10;
   dispVals[1][3] = secs % 10;
+
 }
 
 void displayMatrix(const uint8_t* image) {
@@ -550,23 +684,19 @@ void refreshDisplays() {
   for (uint8_t i = 0; i < 2; i++) {
     for (uint8_t d = 0; d < 4; d++) {
       uint8_t num = dispVals[i][d];
-      uint8_t dp  = dispDP[i][d] ? 1 : 0;
-
-      if (i == 0) {
-        PORTC = segmentBytes[i][num][dp];
-      } else {
-        PORTA = segmentBytes[i][num][dp];
+      for (uint8_t s = 0; s < 8; s++) {
+        uint8_t val = segmentPatterns[num][s];
+        if (s == 7 && dispDP[i][d]) val = 1;
+        digitalWrite(segmentPins[i][s], val ? HIGH : LOW);
       }
-
-      digitalWrite(digitPins[i][d], LOW);   // enable digit
-      delayMicroseconds(800);
-      digitalWrite(digitPins[i][d], HIGH);  // disable digit
+      digitalWrite(digitPins[i][d], LOW);
+      delayMicroseconds(2000);
+      digitalWrite(digitPins[i][d], HIGH);
     }
   }
 }
 
 void setup() {
-  launchTime = toUnix(L_Zero);
   // keypad shit
   keypad.addEventListener(keypadEvent);
   keypad.setHoldTime(1500);
@@ -594,7 +724,6 @@ void setup() {
     digitalWrite(segmentPins[0][i], LOW);
     digitalWrite(segmentPins[1][i], LOW);
   }
-  initSegmentBytes();
 
   Wire.begin();
   if (!rtc.begin()) {
@@ -602,6 +731,9 @@ void setup() {
   }
   // rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 
+  timeValid = checkTimeValid(L_Zero);
+  if (!timeValid) errorMode;
+  launchTime = toUnix(L_Zero);
   updateDayMode();
   lastUpdate = millis();
 }
