@@ -146,7 +146,7 @@ LedControl lc = LedControl(DIN_PIN, CLK_PIN, CS_PIN, 2);
 uint32_t lastUpdate = 0;
 
 
-void errorMode() {
+void errorMode(String str) {
   errorModeActive = true;
   displayMatrix(ER_Matrix);
   resetMatrix = false;
@@ -160,18 +160,25 @@ void errorMode() {
   do {
     char key = keypad.getKey();
     if (resetMatrix) {
+      for (int i = 0; i < 4; i++) {
+        dispVals[0][i] = 10;
+        dispVals[1][i] = 10;
+        dispDP[0][i] = false;
+        dispDP[1][i] = false;
+      }
+      refreshDisplays();
       displayMatrix(ER_Matrix);
       resetMatrix = false;
     }
-    if (key == 'C') {
+    if (key == 'C' && str == "CT") {
       resetCurrentTime();
       resetMatrix = true;
     }
-    if (key == '*') {
+    if (key == '*' && (str == "LD" || str == "LX")) {
       resetLaunchDate();
       resetMatrix = true;
     }
-    if (key == '#') {
+    if (key == '#' && (str == "LT" || str == "LX")) {
       resetLaunchTime();
       resetMatrix = true;
     }
@@ -219,9 +226,8 @@ void keypadEvent(KeypadEvent key) {
       break;
     
     case HOLD:
-      if (key == 'A' && !pauseActive && !showTimeActive && !showLDActive && !showLTActive) {
-        displayOn = !displayOn;
-        bypass = true;
+      if (key == 'A' && !pauseActive && !showTimeActive && !showLDActive && !showLTActive && displayOn) {
+        displayOn = false;
         findMode();
       }
       if (key == 'C' && !pauseActive && displayOn && !showTimeActive && !showLDActive && !showLTActive) {
@@ -246,32 +252,39 @@ void keypadEvent(KeypadEvent key) {
       break;
     
     case RELEASED:
-      if (key == 'A' && !pauseActive && !showTimeActive && !showLDActive && !showLTActive && displayOn) {
-        if (exitShowLD) {
-        exitShowLD = false;
-        } else {
-          if (bypass) bypass = false;
-          else {
-            brightnessMode++;
-            if (brightnessMode == 3) brightnessMode = 0;
-            for (int i = 0; i < 2; i++) {
-              lc.setIntensity(i, displayIntensity[brightnessMode][i]);
-            }
+      if (key == 'A' && !pauseActive && !showTimeActive && !showLDActive && !showLTActive) {
+        if (!displayOn && !bypass) bypass = true;
+        else if (!displayOn && bypass) {
+          displayOn = true;
+          bypass = false;
           findMode();
+        } else {
+          if (exitShowLD) {
+          exitShowLD = false;
+          } else {
+              brightnessMode++;
+              if (brightnessMode == 3) brightnessMode = 0;
+              for (int i = 0; i < 2; i++) {
+                lc.setIntensity(i, displayIntensity[brightnessMode][i]);
+              }
+            findMode();
           }
         }
       }
-      if (key == 'B' && !pauseActive && !showTimeActive && !showLDActive && !showLTActive) {
+      if (key == 'B' && !pauseActive && !showTimeActive && !showLDActive && !showLTActive && displayOn) {
       hourMode = !hourMode;
       findMode();
       }
-      if (key == 'C' && !pauseActive && !showLDActive && !showLTActive) {
-        if (exitPause) exitPause = false;
-        else if (bypassShowTime) bypassShowTime = false;
-        else if (!showTimeActive) {
-          showTime();
-        } else {
-          exitShowTime = true;
+      if (key == 'C' && !pauseActive && !showLDActive && !showLTActive && displayOn) {
+        if (bypass) bypass = false;
+        else {
+          if (exitPause) exitPause = false;
+          else if (bypassShowTime) bypassShowTime = false;
+          else if (!showTimeActive) {
+            showTime();
+          } else {
+            exitShowTime = true;
+          }
         }
       }
       if (key == 'D') {
@@ -281,7 +294,7 @@ void keypadEvent(KeypadEvent key) {
           pauseActive = false;
         } 
       }
-      if (key == '*' && !pauseActive && !showTimeActive) {
+      if (key == '*' && !pauseActive && !showTimeActive && displayOn) {
         if (showLTActive) {
         exitShowLT = true;
         }
@@ -293,7 +306,7 @@ void keypadEvent(KeypadEvent key) {
           exitShowLD = false;
         }
       }
-      if (key == '#' && !pauseActive && !showTimeActive) {
+      if (key == '#' && !pauseActive && !showTimeActive && displayOn) {
         if (showLDActive) {
         exitShowLD = true;
         }
@@ -352,6 +365,11 @@ void resetCurrentTime() {
             showInputPreview(inpString);
           }
           break;
+
+        case 'B':
+          inpString = "";
+          showInputPreview(inpString);
+          break;
           
         case 'C':
           if (inpString.length() == 6) {
@@ -387,7 +405,7 @@ void resetCurrentTime() {
   CT_Reset = false;
   timeValid = checkTimeValid(CT_Set);
   if (errorModeActive) return;
-  if (!timeValid) errorMode();
+  if (!timeValid) errorMode("CT");
   countDelayed = false;
   DateTime newTime(CT_Set[0], CT_Set[1], CT_Set[2], CT_Set[3], CT_Set[4], CT_Set[5]); // create datetime with new time
   rtc.adjust(newTime);
@@ -395,6 +413,9 @@ void resetCurrentTime() {
 }
 void resetLaunchDate() {
   LD_Reset = true;
+  bool addDay = false;
+  uint32_t newL_Zero[6] = {L_Zero[0], L_Zero[1], L_Zero[2], L_Zero[3], L_Zero[4], L_Zero[5]};
+  uint8_t daysAdded = 0;
   bool validity;
   displayMatrix(LD_Matrix);
   for (int i = 0; i < 4; i++) {
@@ -416,6 +437,7 @@ void resetLaunchDate() {
     if (key) {
       switch (key) {
         case '0' ... '9':
+          if (addDay) break;
           if (inpString.length() < 8) {
             inpString += key;
             showInputPreview(inpString);
@@ -423,26 +445,71 @@ void resetLaunchDate() {
           break;
         
         case 'A':
-          ++L_Zero[2];
-          validity = checkTimeValid(L_Zero);
-          if (!validity) {
-            L_Zero[2] = 1;
-            ++L_Zero[1];
+          if (!addDay) {
+            for (int i = 0; i < 4; i++) {
+              dispVals[0][i] = 10;
+              dispVals[1][i] = 10;
+              dispDP[0][i] = false;
+              dispDP[1][i] = false;
+            }
+            addDay = true;
+            inpString = "";
           }
-          validity = checkTimeValid(L_Zero);
-          if (!validity) {
-            L_Zero[1] = 1;
-            ++L_Zero[0];
+          ++daysAdded;
+          if (daysAdded > 7) {
+            daysAdded = 7;
+            break;
           }
-          validity = checkTimeValid(L_Zero);
-          if (!validity) errorMode();
-          EEPROM.put(0, L_Zero);
-          launchTime = toUnix(L_Zero);
-          LD_Reset = false;
-          resetMatrix = true;
-          return;
-          
+          dispVals[1][3] = daysAdded;
+          refreshDisplays();
+          ++newL_Zero[2];
+          validity = checkTimeValid(newL_Zero);
+          if (!validity) {
+            newL_Zero[2] = 1;
+            ++newL_Zero[1];
+          }
+          validity = checkTimeValid(newL_Zero);
+          if (!validity) {
+            newL_Zero[1] = 1;
+            ++newL_Zero[0];
+          }
+          break;
+        
+        case 'B':
+          if (addDay) {
+            addDay = false;
+            daysAdded = 0;
+            dispVals[1][3] = 10;
+            dispDP[0][3] = true;
+            dispDP[1][1] = true;
+            refreshDisplays();
+          } else {
+            inpString = "";
+            showInputPreview(inpString);
+          }
+          break;
+        
+        case 'C':
+          if (addDay) {
+            LD_Reset = false;
+            resetMatrix = true;
+            bypass = true;
+            return;
+          } else break;
+
         case '*':
+          if (addDay) {
+            validity = checkTimeValid(newL_Zero);
+            if (!validity) errorMode("LD");
+            for (int i = 0; i < 6; i++) {
+              L_Zero[i] = newL_Zero[i];
+            }
+            EEPROM.put(0, L_Zero);
+            launchTime = toUnix(L_Zero);
+            LD_Reset = false;
+            resetMatrix = true;
+            return;
+          }
           if (inpString.length() == 8) {
             parseAndSetL_Zero(inpString);
             inputDone = true;
@@ -454,6 +521,15 @@ void resetLaunchDate() {
           break;
         
         case 'D':
+          if (addDay) {
+            for (int i = 0; i < 6; i++) {
+              newL_Zero[i] = L_Zero[i];
+            }
+            daysAdded = 0;
+            dispVals[1][3] = 0;
+            refreshDisplays();
+            break;
+          }
           if (inpString.length() > 0) {
             inpString.remove(inpString.length() - 1);
             showInputPreview(inpString);
@@ -476,7 +552,7 @@ void resetLaunchDate() {
   LD_Reset = false;
   timeValid = checkTimeValid(L_Zero);
   if (errorModeActive) return;
-  if (!timeValid) errorMode();
+  if (!timeValid) errorMode("LD");
   launchTime = toUnix(L_Zero);
   countDelayed = false;
   findMode();
@@ -507,6 +583,11 @@ void resetLaunchTime() {
             inpString += key;
             showInputPreview(inpString);
           }
+          break;
+        
+        case 'B':
+          inpString = "";
+          showInputPreview(inpString);
           break;
           
         case '#':
@@ -543,7 +624,7 @@ void resetLaunchTime() {
   LT_Reset = false;
   timeValid = checkTimeValid(L_Zero);
   if (errorModeActive) return;
-  if (!timeValid) errorMode();
+  if (!timeValid) errorMode("LT");
   launchTime = toUnix(L_Zero);
   countDelayed = false;
   findMode();
@@ -778,7 +859,6 @@ void updateDayMode() {
   dispVals[1][2] = secs / 10;
   dispVals[1][3] = secs % 10;
 }
-
 void updateHourMode() {
   // Set DPs
   dispDP[0][0] = false;
@@ -836,7 +916,6 @@ void displayMatrix(const uint8_t* image) {
     lc.setLed(1, 7, 7, countDelayed);
   }
 }
-
 void refreshDisplays() {
   bool changed = false;
   
@@ -894,7 +973,7 @@ void setup() {
     }
   }
   timeValid = checkTimeValid(L_Zero);
-  if (!timeValid) errorMode();
+  if (!timeValid) errorMode("LX");
   launchTime = toUnix(L_Zero);
 
   //rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
