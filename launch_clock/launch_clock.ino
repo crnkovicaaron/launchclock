@@ -28,6 +28,7 @@ bool exitShowLD = false;
 bool showLTActive = false;
 bool exitShowLT = false;
 bool CT_Reset = false;
+bool CD_Reset = false;
 bool LD_Reset = false;
 bool LT_Reset = false;
 bool resetMatrix = false;
@@ -89,6 +90,16 @@ const uint8_t CT_Matrix[8] = {
   0b10000010,
   0b10000010,
   0b11100010
+};
+const uint8_t CD_Matrix[8] = {
+  0b11101110,
+  0b10001001,
+  0b10001001,
+  0b10001001,
+  0b10001001,
+  0b10001001,
+  0b10001001,
+  0b11101110
 };
 const uint8_t LT_Matrix[8] = {
   0b10011111,
@@ -157,6 +168,21 @@ void errorMode(String str) {
     dispDP[1][i] = false;
   }
   refreshDisplays();
+  if (str == "ND") {
+    uint32_t lastBlink = millis();
+    bool matrixOn = true;
+    while (true) {
+      if (millis() - lastBlink >= blinkInterval) {
+        matrixOn = !matrixOn;
+        lastBlink = millis();
+        if (matrixOn) {
+          displayMatrix(ER_Matrix);
+        } else {
+          displayMatrix(matrixOFF);
+        }
+      }
+    }
+  }
   do {
     char key = keypad.getKey();
     if (resetMatrix) {
@@ -172,6 +198,10 @@ void errorMode(String str) {
     }
     if (key == 'C' && str == "CT") {
       resetCurrentTime();
+      resetMatrix = true;
+    }
+    if (key == 'C' && str == "CD") {
+      resetCurrentDate();
       resetMatrix = true;
     }
     if (key == '*' && (str == "LD" || str == "LX")) {
@@ -215,7 +245,7 @@ bool checkTimeValid(uint32_t T[]) {
 }
 
 void keypadEvent(KeypadEvent key) {
-  if (LT_Reset || LD_Reset || CT_Reset || !timeValid) return;
+  if (LT_Reset || LD_Reset || CT_Reset || CD_Reset || !timeValid) return;
   switch (keypad.getState()) {
     case PRESSED:
       if (key == 'C' && pauseActive) {
@@ -410,6 +440,67 @@ void resetCurrentTime() {
   DateTime newTime(CT_Set[0], CT_Set[1], CT_Set[2], CT_Set[3], CT_Set[4], CT_Set[5]); // create datetime with new time
   rtc.adjust(newTime);
   findMode();
+}
+void resetCurrentDate() {
+  // This function is only called if loss of RTC power is detected. Not accessible in standard UI
+  CD_Reset = true;
+  displayMatrix(CD_Matrix);
+  for (int i = 0; i < 4; i++) {
+    dispVals[0][i] = 10;
+    dispVals[1][i] = 10;
+    dispDP[0][i] = false;
+    dispDP[1][i] = false;
+  }
+  dispDP[0][3] = true;
+  dispDP[1][1] = true;
+  uint32_t lastBlink = millis();
+  bool matrixOn = true;
+
+  String inpString = "";
+  bool inputDone = false;
+
+  while (!inputDone) {
+    char key = keypad.getKey();
+    if (key) {
+      switch (key) {
+        case '0' ... '9':
+          if (inpString.length() < 8) {
+            inpString += key;
+            showInputPreview(inpString);
+          }
+          break;
+          
+        case 'C':
+          if (inpString.length() == 8) {
+            parseAndSet_CD(inpString);
+            inputDone = true;
+          }
+          break;
+        
+        case 'D':
+          if (inpString.length() > 0) {
+            inpString.remove(inpString.length() - 1);
+            showInputPreview(inpString);
+          }
+          break;
+      }
+    }
+    if (millis() - lastBlink >= blinkInterval) {
+      matrixOn = !matrixOn;
+      lastBlink = millis();
+      if (matrixOn) {
+        displayMatrix(CD_Matrix);
+      } else {
+        displayMatrix(matrixOFF);
+      }
+    }
+    refreshDisplays();
+    delay(10);
+  }
+  CD_Reset = false;
+  timeValid = checkTimeValid(CT_Set);
+  if (errorModeActive) return;
+  if (!timeValid) errorMode("CD");
 }
 void resetLaunchDate() {
   LD_Reset = true;
@@ -631,11 +722,12 @@ void resetLaunchTime() {
 }
 void showInputPreview(const String& str) {
   String displayStr = str;
-  if (LD_Reset) {
+  if (LD_Reset || CD_Reset) {
     while (displayStr.length() < 8) displayStr = displayStr + " ";
   } else if (LT_Reset || CT_Reset) {
     while (displayStr.length() < 6) displayStr = displayStr + " ";
-  }
+  } else errorMode("ND");
+
   for (int i = 0; i < 4; i++) {
     char c = displayStr[displayStr.length() - 8 + i];
     dispVals[0][i] = (c >= '0' && c <= '9') ? c - '0' : 10;
@@ -648,7 +740,7 @@ void showInputPreview(const String& str) {
 void parseAndSet_CT(const String& s) {
   if (s.length() < 6) return;
 
-  long newCT[3] = {0, 0, 0};
+  uint32_t newCT[3] = {0, 0, 0};
 
   newCT[0] = s.substring(0,2).toInt();
   newCT[1] = s.substring(2,4).toInt();
@@ -657,11 +749,25 @@ void parseAndSet_CT(const String& s) {
   DateTime now = rtc.now(); // current time on rtc
 
   // Writing new time to CT_Set (global) for validity verification
-  CT_Set[0] = now.year();
-  CT_Set[1] = now.month();
-  CT_Set[2] = now.day();
+  if (CT_Set[0] == 2000 && CT_Set[1] == 1 && CT_Set[2] == 1) {
+    CT_Set[0] = now.year();
+    CT_Set[1] = now.month();
+    CT_Set[2] = now.day();
+  }
   for (int i = 3; i < 6; i++) {
     CT_Set[i] = newCT[i-3];
+  }
+}
+void parseAndSet_CD(const String& s) {
+  if (s.length() < 8) return;
+
+  uint32_t newCD[3] = {0, 0, 0};
+
+  newCD[0] = s.substring(0,4).toInt();
+  newCD[1] = s.substring(4,6).toInt();
+  newCD[2] = s.substring(6,8).toInt();
+  for (int i = 0; i < 3; i++) {
+    CT_Set[i] = newCD[i];
   }
 }
 void parseAndSetL_Zero(const String& s) {
@@ -956,9 +1062,7 @@ void setup() {
   lc.shutdown(1, false);
   lc.setIntensity(1, 2);
 
-
   memset(prevDispVals, 11, sizeof(prevDispVals));  // ensure first refreshDisplays() writes everything
-
 
   Wire.begin();
   if (!rtc.begin()) {
@@ -975,6 +1079,12 @@ void setup() {
   timeValid = checkTimeValid(L_Zero);
   if (!timeValid) errorMode("LX");
   launchTime = toUnix(L_Zero);
+
+  if (rtc.lostPower()) {
+    resetCurrentDate();
+    resetCurrentTime();
+    bypassShowTime = true;
+  }
 
   //rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
   
