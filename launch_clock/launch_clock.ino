@@ -2,10 +2,10 @@
 #include <RTClib.h>
 #include <Keypad.h>
 #include <LedControl.h>
-#include "set.h"
+#include <set.h>
 #include <EEPROM.h>
 
-RTC_DS1307 rtc;
+RTC_DS3231 rtc;
 
 // L-0 time. Format: {Y, M, D, h, m, s}
 uint32_t L_Zero[6] = {2026, 4, 1, 18, 35, 12};
@@ -48,74 +48,74 @@ const char keys[4][4] = {
   { '*', '0', '#', 'D' }
 };
 const uint8_t L_Plus[8] = {
-  0b00001000,
-  0b00011100,
-  0b00001000,
-  0b00000000,
-  0b00000001,
-  0b00000001,
-  0b00000001,
-  0b11111111
+  0b10000000,
+  0b10000000,
+  0b10000000,
+  0b10000010,
+  0b10000111,
+  0b10000010,
+  0b10000000,
+  0b11110000
 };
 const uint8_t L_Minus[8] = {
-  0b00001000,
-  0b00001000,
-  0b00001000,
-  0b00000000,
-  0b00000001,
-  0b00000001,
-  0b00000001,
-  0b11111111
+  0b10000000,
+  0b10000000,
+  0b10000000,
+  0b10000000,
+  0b10000111,
+  0b10000000,
+  0b10000000,
+  0b11110000
 };
 const uint8_t L_Pause[8] = {
-  0b00011100,
-  0b00000000,
-  0b00011100,
-  0b00000000,
-  0b00000001,
-  0b00000001,
-  0b00000001,
-  0b11111111
+  0b10000000,
+  0b10000000,
+  0b10000000,
+  0b10000101,
+  0b10000101,
+  0b10000101,
+  0b10000000,
+  0b11110000
 };
 const uint8_t CT_Matrix[8] = {
-  0b10000000,
-  0b11111111,
-  0b10000000,
-  0b00000000,
-  0b00000000,
-  0b10000001,
-  0b10000001,
-  0b11111111
+  0b11100111,
+  0b10000010,
+  0b10000010,
+  0b10000010,
+  0b10000010,
+  0b10000010,
+  0b10000010,
+  0b11100010
 };
 const uint8_t LT_Matrix[8] = {
-  0b10000000,
-  0b10000000,
-  0b11111111,
-  0b10000000,
-  0b10000001,
-  0b00000001,
-  0b00000001,
-  0b11111111
+  0b10011111,
+  0b10000100,
+  0b10000100,
+  0b10000100,
+  0b10000100,
+  0b10000100,
+  0b10000100,
+  0b11110100
 };
 const uint8_t LD_Matrix[8] = {
-  0b01111110,
-  0b10000001,
-  0b10000001,
-  0b11111111,
-  0b00000000,
-  0b00000001,
-  0b00000001,
-  0b11111111
+  0b10001110,
+  0b10001001,
+  0b10001001,
+  0b10001001,
+  0b10001001,
+  0b10001001,
+  0b10001001,
+  0b11101110
 };
 const uint8_t ER_Matrix[8] = {
-  0b11100111,
-  0b10011000,
-  0b10010000,
-  0b11111111,
-  0b00000000,
+  0b11101111,
   0b10001001,
   0b10001001,
-  0b11111111
+  0b10001110,
+  0b11101010,
+  0b10001001,
+  0b10001001,
+  0b11101001
 };
 const uint8_t matrixOFF[8] = {
   0b00000000,
@@ -135,7 +135,7 @@ bool dispDP[2][4]  = {
   {false, true, false, true},
   {false, true, false, false}
 };
-uint8_t prevDispVals[2][4] = {{11,11,11,11},{11,11,11,11}};  // 11 is impossible value to force initial update
+uint8_t prevDispVals[2][4] = {{11,11,11,11},{11,11,11,11}};  // 11 to force initial update
 bool    prevDispDP[2][4]   = {{true,true,true,true},{true,true,true,true}};
 
 Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, 4, 4);
@@ -153,6 +153,7 @@ void errorMode() {
   dispDP[0][i] = false;
   dispDP[1][i] = false;
   }
+  refreshDisplays();
   do {
     char key = keypad.getKey();
     if (resetMatrix) {
@@ -221,7 +222,7 @@ void keypadEvent(KeypadEvent key) {
       }
       if (key == 'D' && !pauseActive) {
         launchTime = toUnix(L_Zero);
-        lc.setLed(1, 0, 7, false);
+        lc.setLed(1, 7, 7, false);
         countDelayed = false;
         exitPause = true;
       }
@@ -261,6 +262,9 @@ void keypadEvent(KeypadEvent key) {
         } 
       }
       if (key == '*' && !pauseActive && !showTimeActive) {
+        if (showLTActive) {
+        exitShowLT = true;
+        }
         if (!showLDActive && !exitShowLD) {
           showLaunchDate();
         } else if (showLDActive && !exitShowLD) exitShowLD = true;
@@ -270,6 +274,9 @@ void keypadEvent(KeypadEvent key) {
         }
       }
       if (key == '#' && !pauseActive && !showTimeActive) {
+        if (showLDActive) {
+        exitShowLD = true;
+        }
         if (!showLTActive && !exitShowLT) {
           showLaunchTime();
         } else if (showLTActive && !exitShowLT) exitShowLT = true;
@@ -785,7 +792,7 @@ void displayMatrix(const uint8_t* image) {
   }
   lastMatrix = image;
   if (image == L_Plus || image == L_Minus || image == L_Pause) {
-    lc.setLed(1, 0, 7, countDelayed);
+    lc.setLed(1, 7, 7, countDelayed);
   }
 }
 
@@ -801,8 +808,7 @@ void refreshDisplays() {
           lc.setRow(0, i + 4*d, dispDP[d][i] ? 0x80 : 0x00);   // blank the digit
         } else {
           lc.setDigit(0, i + 4*d, dispVals[d][i], dispDP[d][i]);
-        }
-        
+        }        
         prevDispVals[d][i] = dispVals[d][i];
         prevDispDP[d][i]   = dispDP[d][i];
         changed = true;
@@ -850,7 +856,7 @@ void setup() {
   if (!timeValid) errorMode();
   launchTime = toUnix(L_Zero);
 
-  // rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+  //rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
   
   updateDayMode();
   lastUpdate = millis();
