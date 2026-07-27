@@ -12,7 +12,7 @@ uint32_t L_Zero[6] = {2026, 4, 1, 18, 35, 12};
 uint32_t launchTime;
 
 const uint8_t autoCancel = 10; // time mode autocancel (in seconds)
-const uint32_t blinkInterval = 500; // matrix blink rate (when applicable)
+const uint32_t blinkInterval = 500; // matrix blink rate in ms (when applicable)
 bool hourMode = false; // Start in day mode
 bool displayOn = true; // Start with display on
 bool pauseActive = false;
@@ -33,7 +33,7 @@ const uint8_t* lastMatrix = nullptr;
 
 const uint8_t rowPins[4] = {53, 52, 51, 50};
 const uint8_t colPins[4] = {49, 48, 47, 46};
-const uint8_t matrixPins[3] = {A8, A9, A10};
+const uint8_t matrixPins[3] = {2, 3, 4};
 
 const uint8_t digitPins[2][4] = {
   {42, 43, 44, 45},
