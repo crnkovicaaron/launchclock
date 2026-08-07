@@ -25,9 +25,11 @@ bool showTimeActive = false;
 bool exitShowTime = false;
 bool bypassShowTime = false;
 bool showLDActive = false;
+bool showVersionActive = false;
 bool exitShowLD = false;
 bool showLTActive = false;
 bool exitShowLT = false;
+bool exitShowVersion = false;
 bool CT_Reset = false;
 bool CD_Reset = false;
 bool LD_Reset = false;
@@ -132,6 +134,16 @@ const uint8_t ER_Matrix[8] = {
   0b10001001,
   0b10001001,
   0b11101001
+};
+const uint8_t V_Matrix[8] = {
+  0b01000010,
+  0b01000010,
+  0b01000010,
+  0b01000010,
+  0b00100100,
+  0b00100100,
+  0b00100100,
+  0b00011000
 };
 const uint8_t matrixOFF[8] = {
   0b00000000,
@@ -313,6 +325,9 @@ void keypadEvent(KeypadEvent key) {
       break;
     
     case HOLD:
+      if (key == '0' && !pauseActive && !showTimeActive && !showLDActive && !showLTActive && displayOn) {
+        showVersion();
+      }
       if (key == 'A' && !pauseActive && !showTimeActive && !showLDActive && !showLTActive && displayOn) {
         displayOn = false;
         findMode();
@@ -339,6 +354,9 @@ void keypadEvent(KeypadEvent key) {
       break;
     
     case RELEASED:
+      if (key == '0' && !pauseActive && !showTimeActive && !showLDActive && !showLTActive) {
+        if (showVersionActive) exitShowVersion = true;
+      }
       if (key == 'A' && !pauseActive && !showTimeActive && !showLDActive && !showLTActive) {
         if (!bypass) {
           bypass = true;
@@ -378,9 +396,7 @@ void keypadEvent(KeypadEvent key) {
         } 
       }
       if (key == '*' && !pauseActive && !showTimeActive && displayOn) {
-        if (showLTActive) {
-        exitShowLT = true;
-        }
+        if (showLTActive) exitShowLT = true;
         if (!showLDActive && !exitShowLD) {
           showLaunchDate();
         } else if (showLDActive && !exitShowLD) exitShowLD = true;
@@ -390,9 +406,7 @@ void keypadEvent(KeypadEvent key) {
         }
       }
       if (key == '#' && !pauseActive && !showTimeActive && displayOn) {
-        if (showLDActive) {
-        exitShowLD = true;
-        }
+        if (showLDActive) exitShowLD = true;
         if (!showLTActive && !exitShowLT) {
           showLaunchTime();
         } else if (showLTActive && !exitShowLT) exitShowLT = true;
@@ -625,6 +639,9 @@ void resetLaunchDate() {
           if (addDay) {
             addDay = false;
             daysAdded = 0;
+            for (int i = 0; i < 6; i++) {
+              newL_Zero[i] = L_Zero[i];
+            }
             dispVals[1][3] = 10;
             dispDP[0][3] = true;
             dispDP[1][1] = true;
@@ -967,6 +984,28 @@ void showTime() {
   } while (!exitShowTime && (millis() - modeStart) < (autoCancel * 1000));
   showTimeActive = false;
   exitShowTime = false;
+}
+void showVersion() {
+  showVersionActive = true;
+  displayMatrix(V_Matrix);
+  for (int i = 0; i < 4; i++) {
+      dispVals[0][i] = 10;
+      dispVals[1][i] = 10;
+      dispDP[0][i] = false;
+      dispDP[1][i] = false;
+    }
+  dispVals[0][0] = 1;
+  dispVals[0][1] = 2;
+  dispVals[0][2] = 2;
+  dispDP[0][1] = true;
+  refreshDisplays();
+
+  do {
+    keypad.getKey();
+    delay(10);
+  } while (!exitShowVersion);
+  showVersionActive = false;
+  exitShowVersion = false;
 }
 
 void updateDayMode() {
