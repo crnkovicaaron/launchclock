@@ -4,6 +4,8 @@
 #include <LedControl.h>
 #include <set.h>
 #include <EEPROM.h>
+#include <avr/sleep.h>
+#include <avr/power.h>
 
 RTC_DS3231 rtc;
 
@@ -155,7 +157,58 @@ bool prevDispDP[2][4]   = {{true,true,true,true},{true,true,true,true}};
 Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, 4, 4);
 LedControl lc = LedControl(DIN_PIN, CLK_PIN, CS_PIN, 2);
 uint32_t lastUpdate = 0;
+ISR(PCINT2_vect) {}
 
+
+void goToSleep() {
+  // Shut down MAX7219s
+  lc.shutdown(0, true);
+  lc.shutdown(1, true);
+
+  for (uint8_t i = 0; i < 4; i++) {
+    pinMode(rowPins[i], INPUT);
+    pinMode(colPins[i], INPUT);
+  }
+
+  pinMode(9, OUTPUT);
+  digitalWrite(9, LOW);
+
+  pinMode(2, INPUT_PULLUP);
+
+  while (digitalRead(2) == LOW) {
+  }
+
+  PCIFR  |= _BV(PCIF2);
+  PCMSK2  = _BV(PCINT18);
+  PCICR  |= _BV(PCIE2);
+
+  uint8_t oldADCSRA = ADCSRA;
+  ADCSRA = 0;
+  power_all_disable();
+
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+  sleep_enable();
+
+  noInterrupts();
+  MCUCR = _BV(BODS) | _BV(BODSE);
+  MCUCR = _BV(BODS);
+  interrupts();
+
+  sleep_cpu(); // sleep until 'A' is pressed
+
+  // wake-up
+  sleep_disable();
+  PCICR  = 0;
+  PCMSK2 = 0;
+  power_all_enable();
+  ADCSRA = oldADCSRA;
+
+  lc.shutdown(0, false);
+  lc.shutdown(1, false);
+  displayOn = true;
+  bypass = false;
+  findMode();
+}
 
 void errorMode(String str) {
   errorModeActive = true;
@@ -283,11 +336,8 @@ void keypadEvent(KeypadEvent key) {
     
     case RELEASED:
       if (key == 'A' && !pauseActive && !showTimeActive && !showLDActive && !showLTActive) {
-        if (!displayOn && !bypass) bypass = true;
-        else if (!displayOn && bypass) {
-          displayOn = true;
-          bypass = false;
-          findMode();
+        if (!bypass) {
+          bypass = true;
         } else {
           if (exitShowLD) {
           exitShowLD = false;
@@ -354,7 +404,7 @@ void keypadEvent(KeypadEvent key) {
   }
 }
 void findMode() {
-  if (displayOn == false) {
+  if (!displayOn) {
     displayMatrix(matrixOFF);
     for (int i = 0; i < 4; i++) {
       dispVals[0][i] = 10;
@@ -362,6 +412,8 @@ void findMode() {
       dispDP[0][i] = false;
       dispDP[1][i] = false;
     }
+    refreshDisplays();
+    goToSleep();
   } else {
     if (hourMode == false) updateDayMode();
     if (hourMode == true) updateHourMode();
@@ -1094,9 +1146,12 @@ void setup() {
 
 void loop() {
   keypad.getKey();
-  if (millis() - lastUpdate >= 1000) {
-    findMode();
-    lastUpdate = millis();
+
+  if (displayOn) {
+    if (millis() - lastUpdate >= 1000) {
+      findMode();
+      lastUpdate = millis();
+    }
+    refreshDisplays();
   }
-  refreshDisplays();
 }
