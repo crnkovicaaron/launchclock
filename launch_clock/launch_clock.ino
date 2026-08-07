@@ -2,7 +2,6 @@
 #include <RTClib.h>
 #include <Keypad.h>
 #include <LedControl.h>
-#include <set.h>
 #include <EEPROM.h>
 #include <avr/sleep.h>
 #include <avr/power.h>
@@ -36,7 +35,8 @@ bool LT_Reset = false;
 bool resetMatrix = false;
 bool errorModeActive = false;
 bool countDelayed = false;
-bool bypass = false;
+bool bypass = true;
+bool bypassCT = false;
 bool timeValid;
 const uint8_t* lastMatrix = nullptr;
 
@@ -170,6 +170,12 @@ void goToSleep() {
     pinMode(colPins[i], INPUT);
   }
 
+  pinMode(6, OUTPUT);
+  digitalWrite(6, HIGH);
+  pinMode(7, OUTPUT);
+  digitalWrite(7, HIGH);
+  pinMode(8, OUTPUT);
+  digitalWrite(8, HIGH);
   pinMode(9, OUTPUT);
   digitalWrite(9, LOW);
 
@@ -277,9 +283,7 @@ uint32_t toUnix(uint32_t T[]) {
 bool checkTimeValid(uint32_t T[]) {
   if (T[0] < 2000 || T[0] > 2100) return false;
   if (T[1] < 1 || T[1] > 12) return false;
-  Set maxMonths;
-  maxMonths.add(1); maxMonths.add(3); maxMonths.add(5); maxMonths.add(7); maxMonths.add(8); maxMonths.add(10); maxMonths.add(12);
-  if (maxMonths.has(T[1])) {
+  if (T[1] == 1 || T[1] == 3 || T[1] == 5 || T[1] == 7 || T[1] == 8 || T[1] == 10 || T[1] == 12) {
     if (T[2] > 31) return false;
   } else if (T[1] != 2) {
     if (T[2] > 30) return false;
@@ -339,16 +343,12 @@ void keypadEvent(KeypadEvent key) {
         if (!bypass) {
           bypass = true;
         } else {
-          if (exitShowLD) {
-          exitShowLD = false;
-          } else {
-              brightnessMode++;
-              if (brightnessMode == 3) brightnessMode = 0;
-              for (int i = 0; i < 2; i++) {
-                lc.setIntensity(i, displayIntensity[brightnessMode][i]);
-              }
-            findMode();
+          brightnessMode++;
+          if (brightnessMode == 3) brightnessMode = 0;
+          for (int i = 0; i < 2; i++) {
+            lc.setIntensity(i, displayIntensity[brightnessMode][i]);
           }
+        findMode();
         }
       }
       if (key == 'B' && !pauseActive && !showTimeActive && !showLDActive && !showLTActive && displayOn) {
@@ -356,8 +356,11 @@ void keypadEvent(KeypadEvent key) {
       findMode();
       }
       if (key == 'C' && !pauseActive && !showLDActive && !showLTActive && displayOn) {
-        if (bypass) bypass = false;
-        else {
+        if (bypassCT) {
+          bypassCT = false;
+          exitShowLD = false;
+          exitShowLT = false;
+        } else {
           if (exitPause) exitPause = false;
           else if (bypassShowTime) bypassShowTime = false;
           else if (!showTimeActive) {
@@ -636,7 +639,7 @@ void resetLaunchDate() {
           if (addDay) {
             LD_Reset = false;
             resetMatrix = true;
-            bypass = true;
+            bypassCT = true;
             return;
           } else break;
 
