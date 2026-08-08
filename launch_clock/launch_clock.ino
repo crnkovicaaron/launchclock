@@ -8,8 +8,7 @@
 
 RTC_DS3231 rtc;
 
-// L-0 time. Format: {Y, M, D, h, m, s}
-uint32_t L_Zero[6] = {2026, 4, 1, 18, 35, 12};
+uint32_t L_Zero[6] = {2026, 4, 1, 18, 35, 12}; // L-0 time. Format: {Y, M, D, h, m, s}
 uint32_t launchTime;
 
 uint32_t CT_Set[6] = {2000, 1, 1, 0, 0, 0}; // for CT set purposes
@@ -19,32 +18,18 @@ const uint32_t blinkInterval = 500; // matrix blink rate in ms (when applicable)
 uint8_t brightnessMode = 1; // initial brightness mode
 bool hourMode = false; // Start in day mode
 bool displayOn = true; // Start with display on
-bool pauseActive = false;
-bool exitPause = false;
-bool showTimeActive = false;
-bool exitShowTime = false;
-bool bypassShowTime = false;
-bool showLDActive = false;
-bool showVersionActive = false;
-bool exitShowLD = false;
-bool showLTActive = false;
-bool exitShowLT = false;
-bool exitShowVersion = false;
-bool CT_Reset = false;
-bool CD_Reset = false;
-bool LD_Reset = false;
-bool LT_Reset = false;
+bool pauseActive = false, exitPause = false, countDelayed = false;
+bool showTimeActive = false, exitShowTime = false, bypassShowTime = false;
+bool showLDActive = false, exitShowLD = false, showLTActive = false, exitShowLT = false;
+bool showVersionActive = false, exitShowVersion = false;
+bool CT_Reset = false, CD_Reset = false, LD_Reset = false, LT_Reset = false;
 bool resetMatrix = false;
-bool errorModeActive = false;
-bool countDelayed = false;
-bool bypass = true;
-bool bypassCT = false;
-bool timeValid;
+bool errorModeActive = false, timeValid;
+bool bypass = true, bypassCT = false;
 const uint8_t* lastMatrix = nullptr;
+uint32_t lastUpdate = 0;
 
-const uint8_t DIN_PIN = A0;
-const uint8_t CLK_PIN = A1;
-const uint8_t CS_PIN = A2;
+const uint8_t DIN_PIN = A0, CLK_PIN = A1, CS_PIN = A2;
 const uint8_t rowPins[4] = {2, 3, 4, 5};
 const uint8_t colPins[4] = {6, 7, 8, 9};
 
@@ -168,7 +153,6 @@ bool prevDispDP[2][4]   = {{true,true,true,true},{true,true,true,true}};
 
 Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, 4, 4);
 LedControl lc = LedControl(DIN_PIN, CLK_PIN, CS_PIN, 2);
-uint32_t lastUpdate = 0;
 ISR(PCINT2_vect) {}
 
 void turnOffDisplays() {
@@ -938,7 +922,9 @@ void showVersion() {
   dispVals[0][0] = 1;
   dispVals[0][1] = 2;
   dispVals[0][2] = 3;
+  dispVals[0][3] = 1;
   dispDP[0][1] = true;
+  dispDP[0][2] = true;
   refreshDisplays();
   do {
     keypad.getKey();
