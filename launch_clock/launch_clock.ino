@@ -171,7 +171,14 @@ LedControl lc = LedControl(DIN_PIN, CLK_PIN, CS_PIN, 2);
 uint32_t lastUpdate = 0;
 ISR(PCINT2_vect) {}
 
-
+void turnOffDisplays() {
+  for (int i = 0; i < 4; i++) {
+      dispVals[0][i] = 10;
+      dispVals[1][i] = 10;
+      dispDP[0][i] = false;
+      dispDP[1][i] = false;
+    }
+}
 void goToSleep() {
   // Shut down MAX7219s
   lc.shutdown(0, true);
@@ -232,12 +239,7 @@ void errorMode(String str) {
   errorModeActive = true;
   displayMatrix(ER_Matrix);
   resetMatrix = false;
-  for (int i = 0; i < 4; i++) {
-    dispVals[0][i] = 10;
-    dispVals[1][i] = 10;
-    dispDP[0][i] = false;
-    dispDP[1][i] = false;
-  }
+  turnOffDisplays();
   refreshDisplays();
   if (str == "ND") {
     uint32_t lastBlink = millis();
@@ -257,12 +259,7 @@ void errorMode(String str) {
   do {
     char key = keypad.getKey();
     if (resetMatrix) {
-      for (int i = 0; i < 4; i++) {
-        dispVals[0][i] = 10;
-        dispVals[1][i] = 10;
-        dispDP[0][i] = false;
-        dispDP[1][i] = false;
-      }
+      turnOffDisplays();
       refreshDisplays();
       displayMatrix(ER_Matrix);
       resetMatrix = false;
@@ -293,7 +290,7 @@ uint32_t toUnix(uint32_t T[]) {
   return(t);
 }
 bool checkTimeValid(uint32_t T[]) {
-  if (T[0] < 2000 || T[0] > 2100) return false;
+  if (T[0] < 2000 || T[0] >= 2100) return false;
   if (T[1] < 1 || T[1] > 12) return false;
   if (T[1] == 1 || T[1] == 3 || T[1] == 5 || T[1] == 7 || T[1] == 8 || T[1] == 10 || T[1] == 12) {
     if (T[2] > 31) return false;
@@ -423,29 +420,19 @@ void keypadEvent(KeypadEvent key) {
 void findMode() {
   if (!displayOn) {
     displayMatrix(matrixOFF);
-    for (int i = 0; i < 4; i++) {
-      dispVals[0][i] = 10;
-      dispVals[1][i] = 10;
-      dispDP[0][i] = false;
-      dispDP[1][i] = false;
-    }
+    turnOffDisplays();
     refreshDisplays();
     goToSleep();
   } else {
-    if (hourMode == false) updateDayMode();
-    if (hourMode == true) updateHourMode();
+    if (hourMode == false) updateMode('D');
+    if (hourMode == true) updateMode('H');
   }
 }
 
 void resetCurrentTime() {
   CT_Reset = true;
   displayMatrix(CT_Matrix);
-  for (int i = 0; i < 4; i++) { // turn displays off
-    dispVals[0][i] = 10;
-    dispVals[1][i] = 10;
-    dispDP[0][i] = false;
-    dispDP[1][i] = false;
-  }
+  turnOffDisplays();
   dispDP[0][3] = true;
   dispDP[1][1] = true;
   uint32_t lastBlink = millis();
@@ -514,12 +501,7 @@ void resetCurrentDate() {
   // This function is only called if loss of RTC power is detected. Not accessible in standard UI
   CD_Reset = true;
   displayMatrix(CD_Matrix);
-  for (int i = 0; i < 4; i++) {
-    dispVals[0][i] = 10;
-    dispVals[1][i] = 10;
-    dispDP[0][i] = false;
-    dispDP[1][i] = false;
-  }
+  turnOffDisplays();
   dispDP[0][3] = true;
   dispDP[1][1] = true;
   uint32_t lastBlink = millis();
@@ -578,12 +560,7 @@ void resetLaunchDate() {
   uint8_t daysAdded = 0;
   bool validity;
   displayMatrix(LD_Matrix);
-  for (int i = 0; i < 4; i++) {
-    dispVals[0][i] = 10;
-    dispVals[1][i] = 10;
-    dispDP[0][i] = false;
-    dispDP[1][i] = false;
-  }
+  turnOffDisplays();
   dispDP[0][3] = true;
   dispDP[1][1] = true;
   uint32_t lastBlink = millis();
@@ -606,12 +583,7 @@ void resetLaunchDate() {
         
         case 'A':
           if (!addDay) {
-            for (int i = 0; i < 4; i++) {
-              dispVals[0][i] = 10;
-              dispVals[1][i] = 10;
-              dispDP[0][i] = false;
-              dispDP[1][i] = false;
-            }
+            turnOffDisplays();
             addDay = true;
             inpString = "";
           }
@@ -663,7 +635,7 @@ void resetLaunchDate() {
         case '*':
           if (addDay) {
             validity = checkTimeValid(newL_Zero);
-            if (!validity) errorMode("LD");
+            if (!validity) errorMode("ND");
             for (int i = 0; i < 6; i++) {
               L_Zero[i] = newL_Zero[i];
             }
@@ -723,12 +695,7 @@ void resetLaunchDate() {
 void resetLaunchTime() {
   LT_Reset = true;
   displayMatrix(LT_Matrix);
-  for (int i = 0; i < 4; i++) {
-    dispVals[0][i] = 10;
-    dispVals[1][i] = 10;
-    dispDP[0][i] = false;
-    dispDP[1][i] = false;
-  }
+  turnOffDisplays();
   dispDP[0][3] = true;
   dispDP[1][1] = true;
   uint32_t lastBlink = millis();
@@ -893,16 +860,9 @@ void showLaunchDate() {
   showLDActive = true;
   displayMatrix(LD_Matrix);
   uint32_t modeStart = millis();
-  dispDP[0][0] = false;
-  dispDP[0][1] = false;
-  dispDP[0][2] = false;
+  turnOffDisplays();
   dispDP[0][3] = true;
-  dispDP[1][0] = false;
   dispDP[1][1] = true;
-  dispDP[1][2] = false;
-  dispDP[1][3] = false;
-  dispVals[0][0] = 10;
-  dispVals[0][1] = 10;
   uint32_t year = L_Zero[0];
   uint8_t month = L_Zero[1];
   uint8_t day = L_Zero[2];
@@ -926,16 +886,9 @@ void showLaunchTime() {
   showLTActive = true;
   displayMatrix(LT_Matrix);
   uint32_t modeStart = millis();
-  dispDP[0][0] = false;
-  dispDP[0][1] = false;
-  dispDP[0][2] = false;
+  turnOffDisplays();
   dispDP[0][3] = true;
-  dispDP[1][0] = false;
   dispDP[1][1] = true;
-  dispDP[1][2] = false;
-  dispDP[1][3] = false;
-  dispVals[0][0] = 10;
-  dispVals[0][1] = 10;
   uint32_t hour = L_Zero[3];
   uint8_t minute = L_Zero[4];
   uint8_t second = L_Zero[5];
@@ -957,16 +910,9 @@ void showTime() {
   showTimeActive = true;
   displayMatrix(CT_Matrix);
   uint32_t modeStart = millis();
-  dispDP[0][0] = false;
-  dispDP[0][1] = false;
-  dispDP[0][2] = false;
+  turnOffDisplays();
   dispDP[0][3] = true;
-  dispDP[1][0] = false;
   dispDP[1][1] = true;
-  dispDP[1][2] = false;
-  dispDP[1][3] = false;
-  dispVals[0][0] = 10;
-  dispVals[0][1] = 10;
   do {
     DateTime time = rtc.now();
     keypad.getKey();
@@ -988,18 +934,12 @@ void showTime() {
 void showVersion() {
   showVersionActive = true;
   displayMatrix(V_Matrix);
-  for (int i = 0; i < 4; i++) {
-      dispVals[0][i] = 10;
-      dispVals[1][i] = 10;
-      dispDP[0][i] = false;
-      dispDP[1][i] = false;
-    }
+  turnOffDisplays();
   dispVals[0][0] = 1;
   dispVals[0][1] = 2;
-  dispVals[0][2] = 2;
+  dispVals[0][2] = 3;
   dispDP[0][1] = true;
   refreshDisplays();
-
   do {
     keypad.getKey();
     delay(10);
@@ -1008,16 +948,11 @@ void showVersion() {
   exitShowVersion = false;
 }
 
-void updateDayMode() {
-  // Set DPs
-  dispDP[0][0] = false;
-  dispDP[0][1] = true;
-  dispDP[0][2] = false;
+void updateMode(char mode) {
+  turnOffDisplays();
+  if (mode == 'D') dispDP[0][1] = true;
   dispDP[0][3] = true;
-  dispDP[1][0] = false;
   dispDP[1][1] = true;
-  dispDP[1][2] = false;
-  dispDP[1][3] = false;
 
   DateTime now = rtc.now();
   uint32_t nowUnix = now.unixtime();
@@ -1032,78 +967,47 @@ void updateDayMode() {
     newMatrix = L_Plus;
   }
   displayMatrix(newMatrix);
-
-  long days  = diff / 86400;
-  long hours = (diff % 86400) / 3600;
-  int mins   = (diff % 3600) / 60;
-  int secs   = diff % 60;
-
-  if (days > 99) {
-    days  = 99;
-    hours = 23;
-    mins  = 59;
-    secs  = 59;
-  }
-
-  dispVals[0][0] = days / 10;
-  if (days < 10) dispVals[0][0] = 10;
-  dispVals[0][1] = days % 10;
-  if (days == 0) {
-    dispVals[0][1] = 10;
-    dispDP[0][1] = false;
-  }
-  dispVals[0][2] = hours / 10;
-  dispVals[0][3] = hours % 10;
+  uint32_t days, hours;
+  uint8_t mins, secs;
+  if (mode == 'D') {
+    days  = diff / 86400;
+    hours = (diff % 86400) / 3600;
+    mins   = (diff % 3600) / 60;
+    secs   = diff % 60;
+    if (days > 99) {
+      days  = 99;
+      hours = 23;
+      mins  = 59;
+      secs  = 59;
+    }
+    dispVals[0][0] = days / 10;
+    if (days < 10) dispVals[0][0] = 10;
+    dispVals[0][1] = days % 10;
+    if (days == 0) {
+      dispVals[0][1] = 10;
+      dispDP[0][1] = false;
+    }
+    dispVals[0][2] = hours / 10;
+    dispVals[0][3] = hours % 10;
+  } else if (mode == 'H') {
+    hours = diff / 3600;
+    mins   = (diff % 3600) / 60;
+    secs   = diff % 60;
+    if (hours > 999) {
+      hours = 999;
+      mins  = 59;
+      secs  = 59;
+    }
+    dispVals[0][0] = 10;
+    dispVals[0][1] = hours / 100;
+    if (hours < 100) dispVals[0][1] = 10;
+    dispVals[0][2] = (hours / 10) % 10;
+    dispVals[0][3] = hours % 10;
+  } else errorMode("ND");
   dispVals[1][0] = mins / 10;
   dispVals[1][1] = mins % 10;
   dispVals[1][2] = secs / 10;
   dispVals[1][3] = secs % 10;
-}
-void updateHourMode() {
-  // Set DPs
-  dispDP[0][0] = false;
-  dispDP[0][1] = false;
-  dispDP[0][2] = false;
-  dispDP[0][3] = true;
-  dispDP[1][0] = false;
-  dispDP[1][1] = true;
-  dispDP[1][2] = false;
-  dispDP[1][3] = false;
-
-  DateTime now = rtc.now();
-  uint32_t nowUnix = now.unixtime();
-  uint32_t diff;
-  const uint8_t* newMatrix;
-
-  if (nowUnix < launchTime) {
-    diff = launchTime - nowUnix;
-    newMatrix = L_Minus;
-  } else {
-    diff = nowUnix - launchTime;
-    newMatrix = L_Plus;
-  }
-  displayMatrix(newMatrix);
-
-  long hours = diff / 3600;
-  int mins   = (diff % 3600) / 60;
-  int secs   = diff % 60;
-
-  if (hours > 999) {
-    hours = 999;
-    mins  = 59;
-    secs  = 59;
-  }
-
-  dispVals[0][0] = 10;
-  dispVals[0][1] = hours / 100;
-  if (hours < 100) dispVals[0][1] = 10;
-  dispVals[0][2] = (hours / 10) % 10;
-  dispVals[0][3] = hours % 10;
-  dispVals[1][0] = mins / 10;
-  dispVals[1][1] = mins % 10;
-  dispVals[1][2] = secs / 10;
-  dispVals[1][3] = secs % 10;
-
 }
 
 void displayMatrix(const uint8_t* image) {
@@ -1156,7 +1060,7 @@ void setup() {
   lc.shutdown(1, false);
   lc.setIntensity(1, 2);
 
-  memset(prevDispVals, 11, sizeof(prevDispVals));  // ensure first refreshDisplays() writes everything
+  memset(prevDispVals, 11, sizeof(prevDispVals));
 
   Wire.begin();
   if (!rtc.begin()) {
@@ -1179,10 +1083,8 @@ void setup() {
     resetCurrentTime();
     bypassShowTime = true;
   }
-
-  //rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
   
-  updateDayMode();
+  updateMode('D');
   lastUpdate = millis();
 }
 
