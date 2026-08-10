@@ -5,16 +5,16 @@
 #include <EEPROM.h>
 #include <avr/sleep.h>
 #include <avr/power.h>
+#include <avr/pgmspace.h>
 
 RTC_DS3231 rtc;
 
-uint32_t L_Zero[6] = {2026, 4, 1, 18, 35, 12}; // L-0 time. Format: {Y, M, D, h, m, s}
+uint16_t L_Zero[6] = {2026, 4, 1, 18, 35, 12}; // L-0 time. Format: {Y, M, D, h, m, s}
 uint32_t launchTime;
-
-uint32_t CT_Set[6] = {2000, 1, 1, 0, 0, 0}; // for CT set purposes
+uint16_t CT_Set[6] = {2000, 1, 1, 0, 0, 0}; // for CT set purposes
 
 const uint8_t autoCancel = 10; // time mode autocancel (in seconds)
-const uint32_t blinkInterval = 500; // matrix blink rate in ms (when applicable)
+const uint16_t blinkInterval = 500; // matrix blink rate in ms (when applicable)
 uint8_t brightnessMode = 1; // initial brightness mode
 bool hourMode = false; // Start in day mode
 bool displayOn = true; // Start with display on
@@ -32,6 +32,7 @@ uint32_t lastUpdate = 0;
 const uint8_t DIN_PIN = A0, CLK_PIN = A1, CS_PIN = A2;
 const uint8_t rowPins[4] = {2, 3, 4, 5};
 const uint8_t colPins[4] = {6, 7, 8, 9};
+const uint8_t unusedPins[7] = {10, 11, 12, 13, A4, 0, 1};
 
 const char keys[4][4] = {
   { '1', '2', '3', 'A' },
@@ -39,8 +40,8 @@ const char keys[4][4] = {
   { '7', '8', '9', 'C' },
   { '*', '0', '#', 'D' }
 };
-const uint8_t displayIntensity[3][2] = {{2,0.9},{8,2},{15,5}}; // for brightnessMode 0,1,2
-const uint8_t L_Plus[8] = {
+const uint8_t displayIntensity[3][2] = {{2,0},{8,2},{15,5}}; // for brightnessMode 0,1,2
+const uint8_t L_Plus[8] PROGMEM = {
   0b10000000,
   0b10000000,
   0b10000000,
@@ -50,7 +51,7 @@ const uint8_t L_Plus[8] = {
   0b10000000,
   0b11110000
 };
-const uint8_t L_Minus[8] = {
+const uint8_t L_Minus[8] PROGMEM= {
   0b10000000,
   0b10000000,
   0b10000000,
@@ -60,7 +61,7 @@ const uint8_t L_Minus[8] = {
   0b10000000,
   0b11110000
 };
-const uint8_t L_Pause[8] = {
+const uint8_t L_Pause[8] PROGMEM = {
   0b10000000,
   0b10000000,
   0b10000000,
@@ -70,7 +71,7 @@ const uint8_t L_Pause[8] = {
   0b10000000,
   0b11110000
 };
-const uint8_t CT_Matrix[8] = {
+const uint8_t CT_Matrix[8] PROGMEM = {
   0b11100111,
   0b10000010,
   0b10000010,
@@ -80,7 +81,7 @@ const uint8_t CT_Matrix[8] = {
   0b10000010,
   0b11100010
 };
-const uint8_t CD_Matrix[8] = {
+const uint8_t CD_Matrix[8] PROGMEM = {
   0b11101110,
   0b10001001,
   0b10001001,
@@ -90,7 +91,7 @@ const uint8_t CD_Matrix[8] = {
   0b10001001,
   0b11101110
 };
-const uint8_t LT_Matrix[8] = {
+const uint8_t LT_Matrix[8] PROGMEM = {
   0b10011111,
   0b10000100,
   0b10000100,
@@ -100,7 +101,7 @@ const uint8_t LT_Matrix[8] = {
   0b10000100,
   0b11110100
 };
-const uint8_t LD_Matrix[8] = {
+const uint8_t LD_Matrix[8] PROGMEM = {
   0b10001110,
   0b10001001,
   0b10001001,
@@ -110,7 +111,7 @@ const uint8_t LD_Matrix[8] = {
   0b10001001,
   0b11101110
 };
-const uint8_t ER_Matrix[8] = {
+const uint8_t ER_Matrix[8] PROGMEM = {
   0b11101111,
   0b10001001,
   0b10001001,
@@ -120,7 +121,7 @@ const uint8_t ER_Matrix[8] = {
   0b10001001,
   0b11101001
 };
-const uint8_t V_Matrix[8] = {
+const uint8_t V_Matrix[8] PROGMEM = {
   0b01000010,
   0b01000010,
   0b01000010,
@@ -130,7 +131,7 @@ const uint8_t V_Matrix[8] = {
   0b00100100,
   0b00011000
 };
-const uint8_t matrixOFF[8] = {
+const uint8_t matrixOFF[8] PROGMEM = {
   0b00000000,
   0b00000000,
   0b00000000,
@@ -156,7 +157,7 @@ LedControl lc = LedControl(DIN_PIN, CLK_PIN, CS_PIN, 2);
 ISR(PCINT2_vect) {}
 
 void turnOffDisplays() {
-  for (int i = 0; i < 4; i++) {
+  for (uint8_t i = 0; i < 4; i++) {
       dispVals[0][i] = 10;
       dispVals[1][i] = 10;
       dispDP[0][i] = false;
@@ -164,7 +165,8 @@ void turnOffDisplays() {
     }
 }
 void goToSleep() {
-  // Shut down MAX7219s
+  // Shut down displays
+  displayMatrix(matrixOFF);
   lc.shutdown(0, true);
   lc.shutdown(1, true);
 
@@ -173,18 +175,17 @@ void goToSleep() {
     pinMode(colPins[i], INPUT);
   }
 
-  pinMode(6, OUTPUT);
-  digitalWrite(6, HIGH);
-  pinMode(7, OUTPUT);
-  digitalWrite(7, HIGH);
-  pinMode(8, OUTPUT);
-  digitalWrite(8, HIGH);
-  pinMode(9, OUTPUT);
-  digitalWrite(9, LOW);
+  pinMode(colPins[0], OUTPUT);
+  digitalWrite(colPins[0], HIGH);
+  pinMode(colPins[1], OUTPUT);
+  digitalWrite(colPins[1], HIGH);
+  pinMode(colPins[2], OUTPUT);
+  digitalWrite(colPins[2], HIGH);
+  pinMode(colPins[3], OUTPUT);
+  digitalWrite(colPins[3], LOW);
+  pinMode(rowPins[0], INPUT_PULLUP);
 
-  pinMode(2, INPUT_PULLUP);
-
-  while (digitalRead(2) == LOW) {
+  while (digitalRead(rowPins[0]) == LOW) {
   }
 
   PCIFR  |= _BV(PCIF2);
@@ -214,6 +215,7 @@ void goToSleep() {
 
   lc.shutdown(0, false);
   lc.shutdown(1, false);
+  memset(prevDispVals, 11, sizeof(prevDispVals)); // force display update
   displayOn = true;
   bypass = false;
   findMode();
@@ -223,9 +225,16 @@ void errorMode(String str) {
   errorModeActive = true;
   displayMatrix(ER_Matrix);
   resetMatrix = false;
-  turnOffDisplays();
-  refreshDisplays();
-  if (str == "ND") {
+  lc.clearDisplay(0);
+  if (str == "ND" || str == "RTC") { // "ND" is hard error, and cannot be escaped. Device must be restarted or reset button be pressed.
+    turnOffDisplays();
+    if (str == "ND") {
+      dispVals[1][2] = 0;
+      dispVals[1][3] = 0;
+    } else if (str == "RTC") {
+      dispVals[1][2] = 0;
+      dispVals[1][3] = 1;
+    }
     uint32_t lastBlink = millis();
     bool matrixOn = true;
     while (true) {
@@ -243,8 +252,7 @@ void errorMode(String str) {
   do {
     char key = keypad.getKey();
     if (resetMatrix) {
-      turnOffDisplays();
-      refreshDisplays();
+      lc.clearDisplay(0);
       displayMatrix(ER_Matrix);
       resetMatrix = false;
     }
@@ -268,12 +276,12 @@ void errorMode(String str) {
   } while (!timeValid);
   errorModeActive = false;
 }
-uint32_t toUnix(uint32_t T[]) {
+uint32_t toUnix(uint16_t T[]) {
   DateTime launch(T[0], T[1], T[2], T[3], T[4], T[5]);
   uint32_t t = launch.unixtime();
   return(t);
 }
-bool checkTimeValid(uint32_t T[]) {
+bool checkTimeValid(uint16_t T[]) {
   if (T[0] < 2000 || T[0] >= 2100) return false;
   if (T[1] < 1 || T[1] > 12) return false;
   if (T[1] == 1 || T[1] == 3 || T[1] == 5 || T[1] == 7 || T[1] == 8 || T[1] == 10 || T[1] == 12) {
@@ -404,8 +412,7 @@ void keypadEvent(KeypadEvent key) {
 void findMode() {
   if (!displayOn) {
     displayMatrix(matrixOFF);
-    turnOffDisplays();
-    refreshDisplays();
+    lc.clearDisplay(0);
     goToSleep();
   } else {
     if (hourMode == false) updateMode('D');
@@ -540,7 +547,7 @@ void resetCurrentDate() {
 void resetLaunchDate() {
   LD_Reset = true;
   bool addDay = false;
-  uint32_t newL_Zero[6] = {L_Zero[0], L_Zero[1], L_Zero[2], L_Zero[3], L_Zero[4], L_Zero[5]};
+  uint16_t newL_Zero[6] = {L_Zero[0], L_Zero[1], L_Zero[2], L_Zero[3], L_Zero[4], L_Zero[5]};
   uint8_t daysAdded = 0;
   bool validity;
   displayMatrix(LD_Matrix);
@@ -751,52 +758,50 @@ void showInputPreview(const String& str) {
     while (displayStr.length() < 6) displayStr = displayStr + " ";
   } else errorMode("ND");
 
-  for (int i = 0; i < 4; i++) {
+  for (uint8_t i = 0; i < 4; i++) {
     char c = displayStr[displayStr.length() - 8 + i];
     dispVals[0][i] = (c >= '0' && c <= '9') ? c - '0' : 10;
   }
-  for (int i = 0; i < 4; i++) {
+  for (uint8_t i = 0; i < 4; i++) {
     char c = displayStr[displayStr.length() - 4 + i];
     dispVals[1][i] = (c >= '0' && c <= '9') ? c - '0' : 10;
   }
 }
 void parseAndSet_CT(const String& s) {
   if (s.length() < 6) return;
-
-  uint32_t newCT[3] = {0, 0, 0};
+  uint16_t newCT[3] = {0, 0, 0};
 
   newCT[0] = s.substring(0,2).toInt();
   newCT[1] = s.substring(2,4).toInt();
   newCT[2] = s.substring(4,6).toInt();
 
   DateTime now = rtc.now(); // current time on rtc
-
   // Writing new time to CT_Set (global) for validity verification
   if (CT_Set[0] == 2000 && CT_Set[1] == 1 && CT_Set[2] == 1) {
     CT_Set[0] = now.year();
     CT_Set[1] = now.month();
     CT_Set[2] = now.day();
   }
-  for (int i = 3; i < 6; i++) {
+  for (uint8_t i = 3; i < 6; i++) {
     CT_Set[i] = newCT[i-3];
   }
 }
 void parseAndSet_CD(const String& s) {
   if (s.length() < 8) return;
 
-  uint32_t newCD[3] = {0, 0, 0};
+  uint16_t newCD[3] = {0, 0, 0};
 
   newCD[0] = s.substring(0,4).toInt();
   newCD[1] = s.substring(4,6).toInt();
   newCD[2] = s.substring(6,8).toInt();
-  for (int i = 0; i < 3; i++) {
+  for (uint8_t i = 0; i < 3; i++) {
     CT_Set[i] = newCD[i];
   }
 }
 void parseAndSetL_Zero(const String& s) {
   if (s.length() < 6) return;
   
-  long newLZero[6] = {-1, -1, -1, -1, -1, -1};
+  uint16_t newLZero[6] = {-1, -1, -1, -1, -1, -1};
   
   if (s.length() == 6) {
     newLZero[3] = s.substring(0,2).toInt();
@@ -809,7 +814,7 @@ void parseAndSetL_Zero(const String& s) {
     newLZero[2] = s.substring(6,8).toInt();
   }
   bool changed = false;
-  for (int i = 0; i < 6; i++) {
+  for (uint8_t i = 0; i < 6; i++) {
     if (newLZero[i] != -1 && newLZero[i] != L_Zero[i]) {
       L_Zero[i] = newLZero[i];
       changed = true;
@@ -835,7 +840,7 @@ void pauseCountdown() {
   } while (!exitPause);
   if (!pauseActive) return;
   DateTime now = rtc.now();
-  long pauseDuration = now.unixtime() - pauseTime.unixtime();
+  uint32_t pauseDuration = now.unixtime() - pauseTime.unixtime();
   launchTime = launchTime + pauseDuration;
   countDelayed = true;
 }
@@ -847,7 +852,7 @@ void showLaunchDate() {
   turnOffDisplays();
   dispDP[0][3] = true;
   dispDP[1][1] = true;
-  uint32_t year = L_Zero[0];
+  uint16_t year = L_Zero[0];
   uint8_t month = L_Zero[1];
   uint8_t day = L_Zero[2];
   dispVals[0][0] = year / 1000;
@@ -862,7 +867,7 @@ void showLaunchDate() {
     keypad.getKey();
     refreshDisplays();
     delay(1);
-  } while (!exitShowLD && (millis() - modeStart) < (autoCancel * 1000));
+  } while (!exitShowLD && (millis() - modeStart) < (autoCancel * 1000UL));
   showLDActive = false;
   exitShowLD = false;
 }
@@ -873,7 +878,7 @@ void showLaunchTime() {
   turnOffDisplays();
   dispDP[0][3] = true;
   dispDP[1][1] = true;
-  uint32_t hour = L_Zero[3];
+  uint16_t hour = L_Zero[3];
   uint8_t minute = L_Zero[4];
   uint8_t second = L_Zero[5];
   dispVals[0][2] = hour / 10;
@@ -886,7 +891,7 @@ void showLaunchTime() {
     keypad.getKey();
     refreshDisplays();
     delay(1);
-  } while (!exitShowLT && (millis() - modeStart) < (autoCancel * 1000));
+  } while (!exitShowLT && (millis() - modeStart) < (autoCancel * 1000UL));
   showLTActive = false;
   exitShowLT = false;
 }
@@ -911,7 +916,7 @@ void showTime() {
     dispVals[1][3] = sec % 10;
     refreshDisplays();
     delay(1);
-  } while (!exitShowTime && (millis() - modeStart) < (autoCancel * 1000));
+  } while (!exitShowTime && (millis() - modeStart) < (autoCancel * 1000UL));
   showTimeActive = false;
   exitShowTime = false;
 }
@@ -953,7 +958,7 @@ void updateMode(char mode) {
     newMatrix = L_Plus;
   }
   displayMatrix(newMatrix);
-  uint32_t days, hours;
+  uint16_t days, hours;
   uint8_t mins, secs;
   if (mode == 'D') {
     days  = diff / 86400;
@@ -999,7 +1004,8 @@ void updateMode(char mode) {
 void displayMatrix(const uint8_t* image) {
   if (image == lastMatrix) return;
   for (uint8_t i = 0; i < 8; i++) {
-    lc.setRow(1, i, image[i]);
+    uint8_t rowData = pgm_read_byte(&image[i]);
+    lc.setRow(1, i, rowData);
   }
   lastMatrix = image;
   if (image == L_Plus || image == L_Minus || image == L_Pause) {
@@ -1007,13 +1013,9 @@ void displayMatrix(const uint8_t* image) {
   }
 }
 void refreshDisplays() {
-  bool changed = false;
-  
-  for (int d = 0; d < 2; d++) {
-    for (int i = 0; i < 4; i++) {
-      if (dispVals[d][i] != prevDispVals[d][i] || 
-          dispDP[d][i] != prevDispDP[d][i]) {
-        
+  for (uint8_t d = 0; d < 2; d++) {
+    for (uint8_t i = 0; i < 4; i++) {
+      if (dispVals[d][i] != prevDispVals[d][i] || dispDP[d][i] != prevDispDP[d][i]) {
         if (dispVals[d][i] == 10) {
           lc.setRow(0, i + 4*d, dispDP[d][i] ? 0x80 : 0x00);   // blank the digit
         } else {
@@ -1021,7 +1023,6 @@ void refreshDisplays() {
         }        
         prevDispVals[d][i] = dispVals[d][i];
         prevDispDP[d][i]   = dispDP[d][i];
-        changed = true;
       }
     }
   }
@@ -1033,30 +1034,26 @@ void setup() {
   keypad.addEventListener(keypadEvent);
   keypad.setHoldTime(1500);
   // display shit
-  pinMode(10, OUTPUT);
-  pinMode(11, OUTPUT);
-  pinMode(13, OUTPUT);
-  digitalWrite(10, LOW);
-  digitalWrite(11, LOW);
-  digitalWrite(13, LOW);
   lc.clearDisplay(0);
   lc.shutdown(0, false);
   lc.setIntensity(0, 8);
   lc.clearDisplay(1);
   lc.shutdown(1, false);
   lc.setIntensity(1, 2);
-
   memset(prevDispVals, 11, sizeof(prevDispVals));
+
+  for (uint8_t i = 0; i < 7; i++) { // pullup unused pins
+    pinMode(unusedPins[i], INPUT_PULLUP);
+  }
 
   Wire.begin();
   if (!rtc.begin()) {
-    while (1) delay(10);
+    errorMode("RTC");
   }
-
-  uint32_t savedLZero[6];
+  uint16_t savedLZero[6];
   EEPROM.get(0, savedLZero);
   if (savedLZero[0] >= 2000 && savedLZero[0] <= 2100) {
-    for (int i = 0; i < 6; i++) {
+    for (uint8_t i = 0; i < 6; i++) {
       L_Zero[i] = savedLZero[i];
     }
   }
