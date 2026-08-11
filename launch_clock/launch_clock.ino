@@ -20,7 +20,7 @@ bool hourMode = false; // Start in day mode
 bool displayOn = true; // Start with display on
 bool pauseActive = false, exitPause = false, countDelayed = false;
 bool showTimeActive = false, exitShowTime = false, bypassShowTime = false;
-bool showLDActive = false, exitShowLD = false, showLTActive = false, exitShowLT = false;
+bool showLDActive = false, exitShowLD = false, showLTActive = false, exitShowLT = false, ignoreNextShow = false;
 bool showVersionActive = false, exitShowVersion = false;
 bool CT_Reset = false, CD_Reset = false, LD_Reset = false, LT_Reset = false;
 bool resetMatrix = false;
@@ -28,6 +28,8 @@ bool errorModeActive = false, timeValid;
 bool bypass = true, bypassCT = false;
 const uint8_t* lastMatrix = nullptr;
 uint32_t lastUpdate = 0;
+uint32_t lastDiff = 0;
+const uint8_t* lastModeMatrix = nullptr;
 
 const uint8_t DIN_PIN = A0, CLK_PIN = A1, CS_PIN = A2;
 const uint8_t rowPins[4] = {2, 3, 4, 5};
@@ -156,6 +158,8 @@ Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, 4, 4);
 LedControl lc = LedControl(DIN_PIN, CLK_PIN, CS_PIN, 2);
 ISR(PCINT2_vect) {}
 
+void updateMode(char mode, bool forceRecalc = true); // forward declaration to make compiler happy :)
+
 void turnOffDisplays() {
   for (uint8_t i = 0; i < 4; i++) {
       dispVals[0][i] = 10;
@@ -226,7 +230,7 @@ void errorMode(String str) {
   displayMatrix(ER_Matrix);
   resetMatrix = false;
   lc.clearDisplay(0);
-  if (str == "ND" || str == "RTC") { // "ND" is hard error, and cannot be escaped. Device must be restarted or reset button be pressed.
+  if (str == "ND" || str == "RTC") { // "ND"  and "RTC" are hard errors, and cannot be escaped. Device must be restarted or reset button be pressed.
     turnOffDisplays();
     if (str == "ND") {
       dispVals[1][2] = 0;
@@ -235,6 +239,7 @@ void errorMode(String str) {
       dispVals[1][2] = 0;
       dispVals[1][3] = 1;
     }
+    refreshDisplays();
     uint32_t lastBlink = millis();
     bool matrixOn = true;
     while (true) {
@@ -274,6 +279,7 @@ void errorMode(String str) {
     }
     delay(1);
   } while (!timeValid);
+  ignoreNextShow = true;
   errorModeActive = false;
 }
 uint32_t toUnix(uint16_t T[]) {
@@ -355,12 +361,12 @@ void keypadEvent(KeypadEvent key) {
           for (int i = 0; i < 2; i++) {
             lc.setIntensity(i, displayIntensity[brightnessMode][i]);
           }
-        findMode();
+          updateMode(hourMode ? 'H' : 'D', false);
         }
       }
       if (key == 'B' && !pauseActive && !showTimeActive && !showLDActive && !showLTActive && displayOn) {
       hourMode = !hourMode;
-      findMode();
+      updateMode(hourMode ? 'H' : 'D', false);
       }
       if (key == 'C' && !pauseActive && !showLDActive && !showLTActive && displayOn) {
         if (bypassCT) {
@@ -385,23 +391,31 @@ void keypadEvent(KeypadEvent key) {
         } 
       }
       if (key == '*' && !pauseActive && !showTimeActive && displayOn) {
-        if (showLTActive) exitShowLT = true;
-        if (!showLDActive && !exitShowLD) {
-          showLaunchDate();
-        } else if (showLDActive && !exitShowLD) exitShowLD = true;
-        else {
-          showLDActive = false;
-          exitShowLD = false;
+        if (ignoreNextShow) {
+          ignoreNextShow = false;
+        } else {
+          if (showLTActive) exitShowLT = true;
+          if (!showLDActive && !exitShowLD) {
+            showLaunchDate();
+          } else if (showLDActive && !exitShowLD) exitShowLD = true;
+          else {
+            showLDActive = false;
+            exitShowLD = false;
+          }
         }
       }
       if (key == '#' && !pauseActive && !showTimeActive && displayOn) {
-        if (showLDActive) exitShowLD = true;
-        if (!showLTActive && !exitShowLT) {
-          showLaunchTime();
-        } else if (showLTActive && !exitShowLT) exitShowLT = true;
-        else {
-          showLTActive = false;
-          exitShowLT = false;
+        if (ignoreNextShow) {
+          ignoreNextShow = false;
+        } else {
+          if (showLDActive) exitShowLD = true;
+          if (!showLTActive && !exitShowLT) {
+            showLaunchTime();
+          } else if (showLTActive && !exitShowLT) exitShowLT = true;
+          else {
+            showLTActive = false;
+            exitShowLT = false;
+          }
         }
       }
       break;
@@ -775,7 +789,7 @@ void parseAndSet_CT(const String& s) {
   newCT[1] = s.substring(2,4).toInt();
   newCT[2] = s.substring(4,6).toInt();
 
-  DateTime now = rtc.now(); // current time on rtc
+  DateTime now = rtc.now();
   // Writing new time to CT_Set (global) for validity verification
   if (CT_Set[0] == 2000 && CT_Set[1] == 1 && CT_Set[2] == 1) {
     CT_Set[0] = now.year();
@@ -926,10 +940,8 @@ void showVersion() {
   turnOffDisplays();
   dispVals[0][0] = 1;
   dispVals[0][1] = 2;
-  dispVals[0][2] = 3;
-  dispVals[0][3] = 1;
+  dispVals[0][2] = 5;
   dispDP[0][1] = true;
-  dispDP[0][2] = true;
   refreshDisplays();
   do {
     keypad.getKey();
@@ -939,24 +951,30 @@ void showVersion() {
   exitShowVersion = false;
 }
 
-void updateMode(char mode) {
+void updateMode(char mode, bool forceRecalc = true) {
   turnOffDisplays();
   if (mode == 'D') dispDP[0][1] = true;
   dispDP[0][3] = true;
   dispDP[1][1] = true;
-
-  DateTime now = rtc.now();
-  uint32_t nowUnix = now.unixtime();
   uint32_t diff;
   const uint8_t* newMatrix;
-
-  if (nowUnix < launchTime) {
-    diff = launchTime - nowUnix;
-    newMatrix = L_Minus;
+  if (forceRecalc) {
+    DateTime now = rtc.now();
+    uint32_t nowUnix = now.unixtime();
+    if (nowUnix < launchTime) {
+      diff = launchTime - nowUnix;
+      newMatrix = L_Minus;
+    } else {
+      diff = nowUnix - launchTime;
+      newMatrix = L_Plus;
+    }
+    lastDiff = diff;
+    lastModeMatrix = newMatrix;
   } else {
-    diff = nowUnix - launchTime;
-    newMatrix = L_Plus;
+    diff = lastDiff;
+    newMatrix = lastModeMatrix;
   }
+
   displayMatrix(newMatrix);
   uint16_t days, hours;
   uint8_t mins, secs;
@@ -1017,7 +1035,7 @@ void refreshDisplays() {
     for (uint8_t i = 0; i < 4; i++) {
       if (dispVals[d][i] != prevDispVals[d][i] || dispDP[d][i] != prevDispDP[d][i]) {
         if (dispVals[d][i] == 10) {
-          lc.setRow(0, i + 4*d, dispDP[d][i] ? 0x80 : 0x00);   // blank the digit
+          lc.setRow(0, i + 4*d, dispDP[d][i] ? 0x80 : 0x00);
         } else {
           lc.setDigit(0, i + 4*d, dispVals[d][i], dispDP[d][i]);
         }        
@@ -1042,7 +1060,7 @@ void setup() {
   lc.setIntensity(1, 2);
   memset(prevDispVals, 11, sizeof(prevDispVals));
 
-  for (uint8_t i = 0; i < 7; i++) { // pullup unused pins
+  for (uint8_t i = 0; i < 7; i++) {
     pinMode(unusedPins[i], INPUT_PULLUP);
   }
 
@@ -1052,14 +1070,14 @@ void setup() {
   }
   uint16_t savedLZero[6];
   EEPROM.get(0, savedLZero);
-  if (savedLZero[0] >= 2000 && savedLZero[0] <= 2100) {
+  if (savedLZero[0] == 65535) {
+  } else if (checkTimeValid(savedLZero)) {
     for (uint8_t i = 0; i < 6; i++) {
       L_Zero[i] = savedLZero[i];
     }
-  }
-  timeValid = checkTimeValid(L_Zero);
-  if (!timeValid) errorMode("LX");
+  } else errorMode("LX");
   launchTime = toUnix(L_Zero);
+  timeValid = true;
 
   if (rtc.lostPower()) {
     resetCurrentDate();
