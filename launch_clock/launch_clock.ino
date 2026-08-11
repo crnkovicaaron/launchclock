@@ -229,7 +229,8 @@ void errorMode(String str) {
   errorModeActive = true;
   displayMatrix(ER_Matrix);
   resetMatrix = false;
-  lc.clearDisplay(0);
+  turnOffDisplays();
+  refreshDisplays();
   if (str == "ND" || str == "RTC") { // "ND"  and "RTC" are hard errors, and cannot be escaped. Device must be restarted or reset button be pressed.
     turnOffDisplays();
     if (str == "ND") {
@@ -257,7 +258,8 @@ void errorMode(String str) {
   do {
     char key = keypad.getKey();
     if (resetMatrix) {
-      lc.clearDisplay(0);
+      turnOffDisplays();
+      refreshDisplays();
       displayMatrix(ER_Matrix);
       resetMatrix = false;
     }
@@ -269,11 +271,11 @@ void errorMode(String str) {
       resetCurrentDate();
       resetMatrix = true;
     }
-    if (key == '*' && (str == "LD" || str == "LX")) {
+    if (key == '*' && (str == "LD")) {
       resetLaunchDate();
       resetMatrix = true;
     }
-    if (key == '#' && (str == "LT" || str == "LX")) {
+    if (key == '#' && (str == "LT")) {
       resetLaunchTime();
       resetMatrix = true;
     }
@@ -568,6 +570,7 @@ void resetLaunchDate() {
   turnOffDisplays();
   dispDP[0][3] = true;
   dispDP[1][1] = true;
+  //refreshDisplays();
   uint32_t lastBlink = millis();
   bool matrixOn = true;
 
@@ -703,6 +706,7 @@ void resetLaunchTime() {
   turnOffDisplays();
   dispDP[0][3] = true;
   dispDP[1][1] = true;
+  //refreshDisplays();
   uint32_t lastBlink = millis();
   bool matrixOn = true;
   
@@ -941,7 +945,9 @@ void showVersion() {
   dispVals[0][0] = 1;
   dispVals[0][1] = 2;
   dispVals[0][2] = 5;
+  dispVals[0][3] = 1;
   dispDP[0][1] = true;
+  dispDP[0][2] = true;
   refreshDisplays();
   do {
     keypad.getKey();
@@ -1059,7 +1065,6 @@ void setup() {
   lc.shutdown(1, false);
   lc.setIntensity(1, 2);
   memset(prevDispVals, 11, sizeof(prevDispVals));
-
   for (uint8_t i = 0; i < 7; i++) {
     pinMode(unusedPins[i], INPUT_PULLUP);
   }
@@ -1075,7 +1080,18 @@ void setup() {
     for (uint8_t i = 0; i < 6; i++) {
       L_Zero[i] = savedLZero[i];
     }
-  } else errorMode("LX");
+  } else {
+    uint16_t tempDate[6] = {savedLZero[0], savedLZero[1], savedLZero[2], 0, 0, 0};
+    uint16_t tempTime[6] = {2000, 1, 1, savedLZero[3], savedLZero[4], savedLZero[5]};
+    if (!checkTimeValid(tempDate) && !checkTimeValid(tempTime)) {
+    } else if (!checkTimeValid(tempDate)) {
+      errorMode("LD");
+      for (uint8_t i = 3; i < 6; i++) L_Zero[i] = savedLZero[i];
+    } else if (!checkTimeValid(tempTime)) {
+      errorMode("LT");
+      for (uint8_t i = 0; i < 3; i++) L_Zero[i] = savedLZero[i];
+    }
+  }
   launchTime = toUnix(L_Zero);
   timeValid = true;
 
@@ -1084,7 +1100,6 @@ void setup() {
     resetCurrentTime();
     bypassShowTime = true;
   }
-  
   updateMode('D');
   lastUpdate = millis();
 }
