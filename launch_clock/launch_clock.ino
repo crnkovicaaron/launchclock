@@ -42,7 +42,6 @@ const char keys[4][4] = {
   { '7', '8', '9', 'C' },
   { '*', '0', '#', 'D' }
 };
-const uint8_t displayIntensity[3][2] = {{2,0},{8,2},{15,5}}; // for brightnessMode 0,1,2
 const uint8_t L_Plus[8] PROGMEM = {
   0b10000000,
   0b10000000,
@@ -143,14 +142,9 @@ const uint8_t matrixOFF[8] PROGMEM = {
   0b00000000,
   0b00000000
 };
-uint8_t dispVals[2][4] = {
-  {0, 0, 0, 0},
-  {0, 0, 0, 0}
-};
-bool dispDP[2][4]  = {
-  {false, true, false, true},
-  {false, true, false, false}
-};
+const uint8_t displayIntensity[3][2] = {{2,0},{8,2},{15,5}}; // for brightnessMode 0,1,2
+uint8_t dispVals[2][4] = {{0, 0, 0, 0},{0, 0, 0, 0}};
+bool dispDP[2][4]  = {{false, true, false, true},{false, true, false, false}};
 uint8_t prevDispVals[2][4] = {{11,11,11,11},{11,11,11,11}};  // 11 to force initial update
 bool prevDispDP[2][4]   = {{true,true,true,true},{true,true,true,true}};
 
@@ -945,7 +939,7 @@ void showVersion() {
   dispVals[0][0] = 1;
   dispVals[0][1] = 2;
   dispVals[0][2] = 5;
-  dispVals[0][3] = 1;
+  dispVals[0][3] = 2;
   dispDP[0][1] = true;
   dispDP[0][2] = true;
   refreshDisplays();
@@ -1073,6 +1067,7 @@ void setup() {
   if (!rtc.begin()) {
     errorMode("RTC");
   }
+  rtc.disable32K();
   uint16_t savedLZero[6];
   EEPROM.get(0, savedLZero);
   if (savedLZero[0] == 65535) {
