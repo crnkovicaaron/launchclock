@@ -11,30 +11,25 @@ RTC_DS3231 rtc;
 
 uint16_t L_Zero[6] = {2026, 4, 1, 18, 35, 12}; // L-0 time. Format: {Y, M, D, h, m, s}
 uint32_t launchTime;
-uint16_t CT_Set[6] = {2000, 1, 1, 0, 0, 0}; // for CT set purposes
+uint16_t CT_Set[6] = {2000, 1, 1, 0, 0, 0};
 
 const uint8_t autoCancel = 10; // time mode autocancel (in seconds)
-const uint16_t blinkInterval = 500; // matrix blink rate in ms (when applicable)
+const uint16_t blinkInterval = 500; // matrix blink rate (in milliseconds)
 uint8_t brightnessMode = 1; // initial brightness mode
-bool hourMode = false; // Start in day mode
-bool displayOn = true; // Start with display on
+bool hourMode = false, displayOn = true;
 bool pauseActive = false, exitPause = false, countDelayed = false;
 bool showTimeActive = false, exitShowTime = false, bypassShowTime = false;
 bool showLDActive = false, exitShowLD = false, showLTActive = false, exitShowLT = false, ignoreNextShow = false;
 bool showVersionActive = false, exitShowVersion = false;
 bool CT_Reset = false, CD_Reset = false, LD_Reset = false, LT_Reset = false;
-bool resetMatrix = false;
 bool errorModeActive = false, timeValid;
-bool bypass = true, bypassCT = false;
+bool bypass = true, bypassCT = false, resetMatrix = false;
 const uint8_t* lastMatrix = nullptr;
-uint32_t lastUpdate = 0;
-uint32_t lastDiff = 0;
 const uint8_t* lastModeMatrix = nullptr;
+uint32_t lastUpdate = 0, lastDiff = 0;
 
 const uint8_t DIN_PIN = A0, CLK_PIN = A1, CS_PIN = A2;
-const uint8_t rowPins[4] = {2, 3, 4, 5};
-const uint8_t colPins[4] = {6, 7, 8, 9};
-const uint8_t unusedPins[7] = {10, 11, 12, 13, A4, 0, 1};
+const uint8_t rowPins[4] = {2, 3, 4, 5}, colPins[4] = {6, 7, 8, 9}, unusedPins[7] = {10, 11, 12, 13, A4, 0, 1};
 
 const char keys[4][4] = {
   { '1', '2', '3', 'A' },
@@ -150,7 +145,7 @@ bool prevDispDP[2][4]   = {{true,true,true,true},{true,true,true,true}};
 
 Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, 4, 4);
 LedControl lc = LedControl(DIN_PIN, CLK_PIN, CS_PIN, 2);
-ISR(PCINT2_vect) {}
+ISR(PCINT2_vect) {} // for sleep mode
 
 void updateMode(char mode, bool forceRecalc = true); // forward declaration to make compiler happy :)
 
@@ -163,7 +158,6 @@ void turnOffDisplays() {
     }
 }
 void goToSleep() {
-  // Shut down displays
   displayMatrix(matrixOFF);
   lc.shutdown(0, true);
   lc.shutdown(1, true);
@@ -172,7 +166,6 @@ void goToSleep() {
     pinMode(rowPins[i], INPUT);
     pinMode(colPins[i], INPUT);
   }
-
   pinMode(colPins[0], OUTPUT);
   digitalWrite(colPins[0], HIGH);
   pinMode(colPins[1], OUTPUT);
@@ -189,22 +182,18 @@ void goToSleep() {
   PCIFR  |= _BV(PCIF2);
   PCMSK2  = _BV(PCINT18);
   PCICR  |= _BV(PCIE2);
-
   uint8_t oldADCSRA = ADCSRA;
   ADCSRA = 0;
   power_all_disable();
-
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);
   sleep_enable();
-
   noInterrupts();
   MCUCR = _BV(BODS) | _BV(BODSE);
   MCUCR = _BV(BODS);
   interrupts();
 
-  sleep_cpu(); // sleep until 'A' is pressed
+  sleep_cpu(); // sleeps until 'A' key is pressed
 
-  // wake-up
   sleep_disable();
   PCICR  = 0;
   PCMSK2 = 0;
@@ -213,7 +202,7 @@ void goToSleep() {
 
   lc.shutdown(0, false);
   lc.shutdown(1, false);
-  memset(prevDispVals, 11, sizeof(prevDispVals)); // force display update
+  memset(prevDispVals, 11, sizeof(prevDispVals)); // force update
   displayOn = true;
   bypass = false;
   findMode();
@@ -425,8 +414,7 @@ void findMode() {
     lc.clearDisplay(0);
     goToSleep();
   } else {
-    if (hourMode == false) updateMode('D');
-    if (hourMode == true) updateMode('H');
+    updateMode(hourMode ? 'H' : 'D');
   }
 }
 
@@ -939,7 +927,7 @@ void showVersion() {
   dispVals[0][0] = 1;
   dispVals[0][1] = 2;
   dispVals[0][2] = 5;
-  dispVals[0][3] = 2;
+  dispVals[0][3] = 3;
   dispDP[0][1] = true;
   dispDP[0][2] = true;
   refreshDisplays();
@@ -1048,10 +1036,8 @@ void refreshDisplays() {
 }
 
 void setup() {
-  // keypad shit
   keypad.addEventListener(keypadEvent);
   keypad.setHoldTime(1500);
-  // display shit
   lc.clearDisplay(0);
   lc.shutdown(0, false);
   lc.setIntensity(0, 8);
