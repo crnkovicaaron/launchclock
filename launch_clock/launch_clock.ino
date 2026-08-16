@@ -927,7 +927,7 @@ void showVersion() {
   dispVals[0][0] = 1;
   dispVals[0][1] = 2;
   dispVals[0][2] = 5;
-  dispVals[0][3] = 3;
+  dispVals[0][3] = 4;
   dispDP[0][1] = true;
   dispDP[0][2] = true;
   refreshDisplays();
@@ -1036,18 +1036,18 @@ void refreshDisplays() {
 }
 
 void setup() {
-  keypad.addEventListener(keypadEvent);
-  keypad.setHoldTime(1500);
   lc.clearDisplay(0);
-  lc.shutdown(0, false);
-  lc.setIntensity(0, 8);
   lc.clearDisplay(1);
+  lc.shutdown(0, false);
   lc.shutdown(1, false);
-  lc.setIntensity(1, 2);
+  lc.setIntensity(0, displayIntensity[1][0]);
+  lc.setIntensity(1, displayIntensity[1][1]);
   memset(prevDispVals, 11, sizeof(prevDispVals));
   for (uint8_t i = 0; i < 7; i++) {
     pinMode(unusedPins[i], INPUT_PULLUP);
   }
+  keypad.addEventListener(keypadEvent);
+  keypad.setHoldTime(1500);
 
   Wire.begin();
   if (!rtc.begin()) {
