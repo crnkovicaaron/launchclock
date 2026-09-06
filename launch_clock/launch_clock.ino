@@ -158,6 +158,10 @@ void turnOffDisplays() {
     }
 }
 void goToSleep() {
+  /* On V3 PCB:
+    Make sure RTC SDA and SCL lines are written low prior to turning off the RTC power GPIO pin. This is mandatory. Wire.h pulls them high all the time, so
+     that may need to be disabled before writing pins low (so "Wire.end()").
+    Make sure CP2102N RX and TX lines are both powered low prior to opening the load switch. Make sure you are certain these are low. */
   displayMatrix(matrixOFF);
   lc.shutdown(0, true);
   lc.shutdown(1, true);
