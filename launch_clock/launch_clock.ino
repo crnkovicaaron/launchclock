@@ -29,6 +29,10 @@ const uint8_t* lastModeMatrix = nullptr;
 uint32_t lastUpdate = 0, lastDiff = 0;
 
 const uint8_t DIN_PIN = A0, CLK_PIN = A1, CS_PIN = A2;
+/*On the V3 PCB:
+  The row and column pins for the keypad change. They should look as follows:
+  const uint8_t rowPins[4] = {9, 8, 7, 6}, colPins[4] = {5, 4, 3, 2}, ...
+*/
 const uint8_t rowPins[4] = {2, 3, 4, 5}, colPins[4] = {6, 7, 8, 9}, unusedPins[7] = {10, 11, 12, 13, A4, 0, 1};
 
 const char keys[4][4] = {
@@ -312,9 +316,11 @@ void keypadEvent(KeypadEvent key) {
       if (key == '0' && !pauseActive && !showTimeActive && !showLDActive && !showLTActive && displayOn) {
         showVersion();
       }
-      if (key == 'A' && !pauseActive && !showTimeActive && !showLDActive && !showLTActive && displayOn) {
+      if (key == 'A' && !pauseActive && !showTimeActive && !showLDActive && !showLTActive && bypass && displayOn) {
         displayOn = false;
-        findMode();
+        turnOffDisplays();
+        refreshDisplays();
+        displayMatrix(matrixOFF);
       }
       if (key == 'C' && !pauseActive && displayOn && !showTimeActive && !showLDActive && !showLTActive) {
         resetCurrentTime();
@@ -342,7 +348,9 @@ void keypadEvent(KeypadEvent key) {
         if (showVersionActive) exitShowVersion = true;
       }
       if (key == 'A' && !pauseActive && !showTimeActive && !showLDActive && !showLTActive) {
-        if (!bypass) {
+        if (!displayOn){
+          findMode();
+        } else if (!bypass) {
           bypass = true;
         } else {
           brightnessMode++;
@@ -414,8 +422,6 @@ void keypadEvent(KeypadEvent key) {
 }
 void findMode() {
   if (!displayOn) {
-    displayMatrix(matrixOFF);
-    lc.clearDisplay(0);
     goToSleep();
   } else {
     updateMode(hourMode ? 'H' : 'D');
@@ -930,10 +936,10 @@ void showVersion() {
   turnOffDisplays();
   dispVals[0][0] = 1;
   dispVals[0][1] = 2;
-  dispVals[0][2] = 5;
-  dispVals[0][3] = 4;
   dispDP[0][1] = true;
-  dispDP[0][2] = true;
+  dispVals[0][2] = 6;
+  //dispDP[0][2] = true;
+  //dispVals[0][3] = 4;
   refreshDisplays();
   do {
     keypad.getKey();
