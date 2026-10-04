@@ -1,0 +1,275 @@
+(footprint "16MHz_resonator"
+	(version 20260206)
+	(generator "pcbnew")
+	(generator_version "10.0")
+	(layer "F.Cu")
+	(property "Reference" "REF**"
+		(at -0.575545 -3.888755 0)
+		(layer "F.SilkS")
+		(uuid "b2d53cf7-8f41-4dfc-ac6e-f26e0ccc3c85")
+		(effects
+			(font
+				(size 1.000969 1.000969)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "XTAL_HC49P488W43L1150T466H350"
+		(at 14.68117 3.3687 0)
+		(layer "F.Fab")
+		(uuid "a716bc76-e233-4203-b53a-f73a0003d273")
+		(effects
+			(font
+				(size 1.001102 1.001102)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "8de9593f-fa43-4589-a5a6-7c02b3791bb5")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "6a59a47d-f559-4d37-8bda-b47c4bdeda9f")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(attr through_hole)
+	(duplicate_pad_numbers_are_jumpers no)
+	(fp_line
+		(start -3.42 -2.33)
+		(end 3.42 -2.33)
+		(stroke
+			(width 0.127)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "187ac945-9bfe-446a-b1f3-90da81655d3e")
+	)
+	(fp_line
+		(start -3.42 2.33)
+		(end 3.42 2.33)
+		(stroke
+			(width 0.127)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "df2910ba-e38b-42d3-bed1-f1238de5e549")
+	)
+	(fp_arc
+		(start -5.75 0)
+		(mid -5.067559 -1.647559)
+		(end -3.42 -2.33)
+		(stroke
+			(width 0.127)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "f4dbce1e-ed05-480f-849c-4d39c543fccd")
+	)
+	(fp_arc
+		(start -3.42 2.33)
+		(mid -5.067559 1.647559)
+		(end -5.75 0)
+		(stroke
+			(width 0.127)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "901e23a4-ac5a-41f4-8c0c-dada77d8e3d3")
+	)
+	(fp_arc
+		(start 3.42 -2.33)
+		(mid 5.067559 -1.647559)
+		(end 5.75 0)
+		(stroke
+			(width 0.127)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "ff6e0d09-7716-46e8-a1e1-083f09ef3a07")
+	)
+	(fp_arc
+		(start 5.75 0)
+		(mid 5.067559 1.647559)
+		(end 3.42 2.33)
+		(stroke
+			(width 0.127)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "d0da9067-e402-4a55-b62b-7ae7936496c9")
+	)
+	(fp_line
+		(start -3.41 -2.58)
+		(end 3.4 -2.58)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "24c3b2d6-ef9c-4eec-a102-bfd32042d391")
+	)
+	(fp_line
+		(start -3.3 2.58)
+		(end 3.4 2.58)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "a00daf8b-972a-490b-923e-58089451c9e1")
+	)
+	(fp_arc
+		(start -6 0)
+		(mid -5.239335 -1.826407)
+		(end -3.41 -2.58)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "2f4d97fc-6020-43f6-bfeb-7ba3d221a1d6")
+	)
+	(fp_arc
+		(start -3.3 2.58)
+		(mid -5.200175 1.865765)
+		(end -6.000001 0)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "7735294e-c0dc-496b-a13f-585a9697093e")
+	)
+	(fp_arc
+		(start 3.4 -2.58)
+		(mid 5.98 0)
+		(end 3.4 2.58)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "262752bb-6710-4c77-a60e-222a3cd1f22f")
+	)
+	(fp_line
+		(start -3.42 -2.33)
+		(end 3.42 -2.33)
+		(stroke
+			(width 0.127)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "a48598f5-57bf-4b72-bd42-bdc0d3311d57")
+	)
+	(fp_line
+		(start -3.42 2.33)
+		(end 3.42 2.33)
+		(stroke
+			(width 0.127)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "149a2153-e8d1-49cb-ad0a-2597f054a48a")
+	)
+	(fp_arc
+		(start -5.75 0)
+		(mid -5.067559 -1.647559)
+		(end -3.42 -2.33)
+		(stroke
+			(width 0.127)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "0e5395a1-9549-4766-9659-31bf30857d8b")
+	)
+	(fp_arc
+		(start -3.42 2.33)
+		(mid -5.067559 1.647559)
+		(end -5.75 0)
+		(stroke
+			(width 0.127)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "b5ee5f14-1647-4c48-a910-11a6f3312715")
+	)
+	(fp_arc
+		(start 3.42 -2.33)
+		(mid 5.067559 -1.647559)
+		(end 5.75 0)
+		(stroke
+			(width 0.127)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "a979d751-4601-490c-a2ab-1827664f26f9")
+	)
+	(fp_arc
+		(start 5.75 0)
+		(mid 5.067559 1.647559)
+		(end 3.42 2.33)
+		(stroke
+			(width 0.127)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "125983f8-54fb-4132-bc66-27cdf23252b1")
+	)
+	(pad "1" thru_hole circle
+		(at -2.44 0)
+		(size 1.08 1.08)
+		(drill 0.68)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(solder_mask_margin 0.102)
+		(uuid "71f8bca8-de6e-4427-bcf2-1d2803979c7f")
+	)
+	(pad "2" thru_hole circle
+		(at 2.44 0)
+		(size 1.08 1.08)
+		(drill 0.68)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(solder_mask_margin 0.102)
+		(uuid "a423f7aa-310c-452a-95ec-7f9efed05e07")
+	)
+	(embedded_fonts no)
+	(model "C:/Users/AaronCrnkovic/Documents/KiCad/3D Models/Launch Clock/16MHz_resonator.step"
+		(hide yes)
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz -90 -0 -0)
+		)
+	)
+	(model "C:/Users/AaronCrnkovic/Documents/KiCad/3D Models/Launch Clock/16MHz_resonator_rev.step"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz -90 -0 -0)
+		)
+	)
+)

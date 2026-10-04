@@ -1,0 +1,234 @@
+(footprint "lc_reset_button"
+	(version 20260206)
+	(generator "pcbnew")
+	(generator_version "10.0")
+	(layer "F.Cu")
+	(property "Reference" "REF**"
+		(at 0 -3.675 0)
+		(layer "F.SilkS")
+		(uuid "df17fb2f-4794-41d4-b5ca-7735f0311fe8")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "SW_TS18-5-25-SL-260-SMT-TR"
+		(at 0 3.665 0)
+		(layer "F.Fab")
+		(uuid "e735f64c-a2e1-4f15-9623-fb1a651aaf14")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "eb74db35-ee49-4324-a8c7-effe0bdaffc7")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "50d3b056-e8af-4c86-9bfb-8a55d5b26d51")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(attr smd)
+	(duplicate_pad_numbers_are_jumpers no)
+	(fp_line
+		(start -2.6 -1)
+		(end -2.6 1)
+		(stroke
+			(width 0.127)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "a186bea2-35c8-4585-b85d-97ae49b967b8")
+	)
+	(fp_line
+		(start -2 -2.6)
+		(end 2 -2.6)
+		(stroke
+			(width 0.127)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "166ff64f-d41d-4626-96ee-357c0f226cb6")
+	)
+	(fp_line
+		(start -2 2.6)
+		(end 2 2.6)
+		(stroke
+			(width 0.127)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "0a5b353c-b103-46a3-b495-abd0afe50f5b")
+	)
+	(fp_line
+		(start 2.6 -1)
+		(end 2.6 1)
+		(stroke
+			(width 0.127)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "ea59a6fd-8f49-4993-8659-571dfefd3b28")
+	)
+	(fp_circle
+		(center -4.7 -1.9)
+		(end -4.6 -1.9)
+		(stroke
+			(width 0.2)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.SilkS")
+		(uuid "80348259-7428-4fbd-a245-3fd1d2443071")
+	)
+	(fp_line
+		(start -4.25 -2.85)
+		(end -4.25 2.85)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "d37ab6a0-c300-455e-83d8-c13462af0341")
+	)
+	(fp_line
+		(start -4.25 2.85)
+		(end 4.25 2.85)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "cc2f3fb1-bd04-4e58-89fe-0ee532b1fcd5")
+	)
+	(fp_line
+		(start 4.25 -2.85)
+		(end -4.25 -2.85)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "bb968f37-8219-4e69-b902-af2d9c5ce7a3")
+	)
+	(fp_line
+		(start 4.25 2.85)
+		(end 4.25 -2.85)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "cac86ff6-a739-4462-9b6d-004fae0fc5f5")
+	)
+	(fp_line
+		(start -2.6 -2.6)
+		(end -2.6 2.6)
+		(stroke
+			(width 0.127)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "d308aee0-0121-47ae-977b-f67020698673")
+	)
+	(fp_line
+		(start -2.6 2.6)
+		(end 2.6 2.6)
+		(stroke
+			(width 0.127)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "814fb552-be0a-4458-b6ec-161dff894eef")
+	)
+	(fp_line
+		(start 2.6 -2.6)
+		(end -2.6 -2.6)
+		(stroke
+			(width 0.127)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "d6d740c0-1add-4fb5-aad4-6ae1196acc3e")
+	)
+	(fp_line
+		(start 2.6 2.6)
+		(end 2.6 -2.6)
+		(stroke
+			(width 0.127)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "2b39693b-4798-42ce-9bb1-a86fccc7edb8")
+	)
+	(fp_circle
+		(center -4.7 -1.9)
+		(end -4.6 -1.9)
+		(stroke
+			(width 0.2)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.Fab")
+		(uuid "4e131ecf-a456-49df-8fee-c07a7e07656c")
+	)
+	(pad "1" smd rect
+		(at -3.15 -1.9)
+		(size 1.7 1)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(solder_mask_margin 0.102)
+		(uuid "e7542a67-e464-43d7-94e9-aa2056b7502b")
+	)
+	(pad "2" smd rect
+		(at 3.15 -1.9)
+		(size 1.7 1)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(solder_mask_margin 0.102)
+		(uuid "d4ca2726-c3d8-41a3-932a-fb63e5016bb3")
+	)
+	(pad "3" smd rect
+		(at -3.15 1.9)
+		(size 1.7 1)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(solder_mask_margin 0.102)
+		(uuid "760b5803-28fb-45e7-9982-632fda344420")
+	)
+	(pad "4" smd rect
+		(at 3.15 1.9)
+		(size 1.7 1)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(solder_mask_margin 0.102)
+		(uuid "26946274-c2be-4c12-96d0-b1a4d030a8d2")
+	)
+	(embedded_fonts no)
+	(model "C:/Users/AaronCrnkovic/Documents/KiCad/3D Models/Launch Clock/lc_reset_button.step"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz -90 -0 -0)
+		)
+	)
+)

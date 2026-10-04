@@ -8,14 +8,19 @@
 #include <avr/pgmspace.h>
 
 RTC_DS3231 rtc;
-
-uint16_t L_Zero[6] = {2026, 4, 1, 18, 35, 12}; // L-0 time. Format: {Y, M, D, h, m, s}
-uint32_t launchTime;
+/* L_Zero and launchTime ostensibly store the same time but serve distinct purposes. L_Zero gets the time stored in EEPROM written to it within the setup function. 
+The hardcoded time in the declaration is used if no time is found in EEPROM. L_Zero is updated when the launch date/time are reset, and should always reflect what 
+is stored in EEPROM. Conversely, launchTime is the variable used in calculating time until launch, and is in unix time. It starts with the same time as in L_Zero 
+(in unix), but can differ from L_Zero if the countdown is paused.*/
+uint16_t L_Zero[6] = {2026, 4, 1, 18, 35, 12}; // Format: {Y, M, D, h, m, s}.
+uint32_t launchTime; // non-persistent value used for calculations
 uint16_t CT_Set[6] = {2000, 1, 1, 0, 0, 0};
 
 const uint8_t autoCancel = 10; // time mode autocancel (in seconds)
 const uint16_t blinkInterval = 500; // matrix blink rate (in milliseconds)
 uint8_t brightnessMode = 1; // initial brightness mode
+
+// boolean flags to create state machine
 bool hourMode = false, displayOn = true;
 bool pauseActive = false, exitPause = false, countDelayed = false;
 bool showTimeActive = false, exitShowTime = false, bypassShowTime = false;
@@ -28,7 +33,8 @@ const uint8_t* lastMatrix = nullptr;
 const uint8_t* lastModeMatrix = nullptr;
 uint32_t lastUpdate = 0, lastDiff = 0;
 
-const uint8_t DIN_PIN = A0, CLK_PIN = A1, CS_PIN = A2;
+// Code uses Arduino Uno pin numbering, even though standalone ATmega328 is used
+const uint8_t DIN_PIN = A0, CLK_PIN = A1, CS_PIN = A2; // MAX7219 SPI pins
 /*On the V3 PCB:
   The row and column pins for the keypad change. They should look as follows:
   const uint8_t rowPins[4] = {9, 8, 7, 6}, colPins[4] = {5, 4, 3, 2}, ...
@@ -41,6 +47,8 @@ const char keys[4][4] = {
   { '7', '8', '9', 'C' },
   { '*', '0', '#', 'D' }
 };
+
+// PROGMEM bitmaps for dot matrix status glyphs
 const uint8_t L_Plus[8] PROGMEM = {
   0b10000000,
   0b10000000,
@@ -141,7 +149,9 @@ const uint8_t matrixOFF[8] PROGMEM = {
   0b00000000,
   0b00000000
 };
-const uint8_t displayIntensity[3][2] = {{2,0},{8,2},{15,5}}; // for brightnessMode 0,1,2
+const uint8_t displayIntensity[3][2] = {{2,0},{8,2},{15,5}}; // LedControl brightness values mapping to brightnessMode 0,1,2
+
+// used for writing to displays
 uint8_t dispVals[2][4] = {{0, 0, 0, 0},{0, 0, 0, 0}};
 bool dispDP[2][4]  = {{false, true, false, true},{false, true, false, false}};
 uint8_t prevDispVals[2][4] = {{11,11,11,11},{11,11,11,11}};  // 11 to force initial update
@@ -153,7 +163,7 @@ ISR(PCINT2_vect) {} // for sleep mode
 
 void updateMode(char mode, bool forceRecalc = true); // forward declaration to make compiler happy :)
 
-void turnOffDisplays() {
+void turnOffDisplays() { // sets displays values to off (but does not update the displays)
   for (uint8_t i = 0; i < 4; i++) {
       dispVals[0][i] = 10;
       dispVals[1][i] = 10;
@@ -216,7 +226,7 @@ void goToSleep() {
   findMode();
 }
 
-void errorMode(String str) {
+void errorMode(String str) { // controls behavior of all error states
   errorModeActive = true;
   displayMatrix(ER_Matrix);
   resetMatrix = false;
@@ -275,12 +285,12 @@ void errorMode(String str) {
   ignoreNextShow = true;
   errorModeActive = false;
 }
-uint32_t toUnix(uint16_t T[]) {
+uint32_t toUnix(uint16_t T[]) { // converts passed time array to unix time and returns it
   DateTime launch(T[0], T[1], T[2], T[3], T[4], T[5]);
   uint32_t t = launch.unixtime();
   return(t);
 }
-bool checkTimeValid(uint16_t T[]) {
+bool checkTimeValid(uint16_t T[]) { // Checks passed array-form time/date are valid (and between years 2000 to 2100)
   if (T[0] < 2000 || T[0] >= 2100) return false;
   if (T[1] < 1 || T[1] > 12) return false;
   if (T[1] == 1 || T[1] == 3 || T[1] == 5 || T[1] == 7 || T[1] == 8 || T[1] == 10 || T[1] == 12) {
@@ -288,7 +298,7 @@ bool checkTimeValid(uint16_t T[]) {
   } else if (T[1] != 2) {
     if (T[2] > 30) return false;
   } else {
-    if (T[0] % 400 == 0 || (T[0] % 4 == 0 && T[0] % 100 != 0)) {
+    if (T[0] % 400 == 0 || (T[0] % 4 == 0 && T[0] % 100 != 0)) { // leap year handling
       if (T[2] > 29) return false;
     } else {
       if (T[2] > 28) return false;
@@ -301,7 +311,7 @@ bool checkTimeValid(uint16_t T[]) {
   return true;
 }
 
-void keypadEvent(KeypadEvent key) {
+void keypadEvent(KeypadEvent key) { // contains all state machine logic via switch and if/else statements. Organized into PRESSED, HOLD, and RELEASED states, and then by specific key
   if (LT_Reset || LD_Reset || CT_Reset || CD_Reset || !timeValid) return;
   switch (keypad.getState()) {
     case PRESSED:
@@ -321,6 +331,7 @@ void keypadEvent(KeypadEvent key) {
         turnOffDisplays();
         refreshDisplays();
         displayMatrix(matrixOFF);
+        // turns off displays but doesn't enter sleep mode until key is released to prevent triggering interrupt
       }
       if (key == 'C' && !pauseActive && displayOn && !showTimeActive && !showLDActive && !showLTActive) {
         resetCurrentTime();
@@ -428,7 +439,7 @@ void findMode() {
   }
 }
 
-void resetCurrentTime() {
+void resetCurrentTime() { // reset the current time on the RTC via keypad.
   CT_Reset = true;
   displayMatrix(CT_Matrix);
   turnOffDisplays();
@@ -552,9 +563,9 @@ void resetCurrentDate() {
   if (errorModeActive) return;
   if (!timeValid) errorMode("CD");
 }
-void resetLaunchDate() {
+void resetLaunchDate() { // reset programmed launch date via keypad
   LD_Reset = true;
-  bool addDay = false;
+  bool addDay = false; // controls day nudging
   uint16_t newL_Zero[6] = {L_Zero[0], L_Zero[1], L_Zero[2], L_Zero[3], L_Zero[4], L_Zero[5]};
   uint8_t daysAdded = 0;
   bool validity;
@@ -562,7 +573,6 @@ void resetLaunchDate() {
   turnOffDisplays();
   dispDP[0][3] = true;
   dispDP[1][1] = true;
-  //refreshDisplays();
   uint32_t lastBlink = millis();
   bool matrixOn = true;
 
@@ -582,7 +592,7 @@ void resetLaunchDate() {
           break;
         
         case 'A':
-          if (!addDay) {
+          if (!addDay) { // launch date can be nudged foward by day up to a week using 'A' key
             turnOffDisplays();
             addDay = true;
             inpString = "";
@@ -692,13 +702,12 @@ void resetLaunchDate() {
   countDelayed = false;
   findMode();
 }
-void resetLaunchTime() {
+void resetLaunchTime() { // reset programmed launch date via keypad. Close to identical to resetLaunchDate without nudging
   LT_Reset = true;
   displayMatrix(LT_Matrix);
   turnOffDisplays();
   dispDP[0][3] = true;
   dispDP[1][1] = true;
-  //refreshDisplays();
   uint32_t lastBlink = millis();
   bool matrixOn = true;
   
@@ -760,7 +769,7 @@ void resetLaunchTime() {
   countDelayed = false;
   findMode();
 }
-void showInputPreview(const String& str) {
+void showInputPreview(const String& str) { // display what user is typing on displays
   String displayStr = str;
   if (LD_Reset || CD_Reset) {
     while (displayStr.length() < 8) displayStr = displayStr + " ";
@@ -836,7 +845,7 @@ void parseAndSetL_Zero(const String& s) {
   }
 }
 
-void pauseCountdown() {
+void pauseCountdown() { // blocking loop within which count is paused
   DateTime pauseTime = rtc.now();
   if (pauseTime.unixtime() >= launchTime) {
     return;
@@ -852,7 +861,7 @@ void pauseCountdown() {
   DateTime now = rtc.now();
   uint32_t pauseDuration = now.unixtime() - pauseTime.unixtime();
   launchTime = launchTime + pauseDuration;
-  countDelayed = true;
+  countDelayed = true; // indicates launchTime and L_Zero differ
 }
 
 void showLaunchDate() {
@@ -930,7 +939,7 @@ void showTime() {
   showTimeActive = false;
   exitShowTime = false;
 }
-void showVersion() {
+void showVersion() { // show software version upon press and hold of '0' key. Updated manually
   showVersionActive = true;
   displayMatrix(V_Matrix);
   turnOffDisplays();
@@ -950,7 +959,8 @@ void showVersion() {
 }
 
 void updateMode(char mode, bool forceRecalc = true) {
-  turnOffDisplays();
+  // the "mode" character argument defines whether the time will be displayed in dd.hh.mm.ss ('D' or day mode) or xhhh.mm.ss ('H' or hour mode) formats
+  turnOffDisplays(); // blank display values (display themselves not changed)
   if (mode == 'D') dispDP[0][1] = true;
   dispDP[0][3] = true;
   dispDP[1][1] = true;
@@ -1025,10 +1035,10 @@ void displayMatrix(const uint8_t* image) {
   }
   lastMatrix = image;
   if (image == L_Plus || image == L_Minus || image == L_Pause) {
-    lc.setLed(1, 7, 7, countDelayed);
+    lc.setLed(1, 7, 7, countDelayed); // turns on single LED indicator when launchTime and L_Zero differ (from countdown pause)
   }
 }
-void refreshDisplays() {
+void refreshDisplays() { // write dispVals and dispDP to the displays
   for (uint8_t d = 0; d < 2; d++) {
     for (uint8_t i = 0; i < 4; i++) {
       if (dispVals[d][i] != prevDispVals[d][i] || dispDP[d][i] != prevDispDP[d][i]) {
@@ -1053,7 +1063,7 @@ void setup() {
   lc.setIntensity(0, displayIntensity[1][0]);
   lc.setIntensity(1, displayIntensity[1][1]);
   memset(prevDispVals, 11, sizeof(prevDispVals));
-  for (uint8_t i = 0; i < 7; i++) {
+  for (uint8_t i = 0; i < 7; i++) { // pull up all unused pins
     pinMode(unusedPins[i], INPUT_PULLUP);
   }
   keypad.addEventListener(keypadEvent);
@@ -1063,15 +1073,15 @@ void setup() {
   if (!rtc.begin()) {
     errorMode("RTC");
   }
-  rtc.disable32K();
+  rtc.disable32K(); // disable 32kHz square wave output on RTC
   uint16_t savedLZero[6];
   EEPROM.get(0, savedLZero);
-  if (savedLZero[0] == 65535) {
-  } else if (checkTimeValid(savedLZero)) {
+  if (savedLZero[0] == 65535) { // if EEPROM is not written to, do nothing (L_Zero will default to hardcoded time in declaration)
+  } else if (checkTimeValid(savedLZero)) { // set L_Zero to time on EEPROM if that time is valid
     for (uint8_t i = 0; i < 6; i++) {
       L_Zero[i] = savedLZero[i];
     }
-  } else {
+  } else { // find which time is invalid and force a reset of it
     uint16_t tempDate[6] = {savedLZero[0], savedLZero[1], savedLZero[2], 0, 0, 0};
     uint16_t tempTime[6] = {2000, 1, 1, savedLZero[3], savedLZero[4], savedLZero[5]};
     if (!checkTimeValid(tempDate) && !checkTimeValid(tempTime)) {
@@ -1086,12 +1096,12 @@ void setup() {
   launchTime = toUnix(L_Zero);
   timeValid = true;
 
-  if (rtc.lostPower()) {
+  if (rtc.lostPower()) { // force current time/date reset when rtc power loss is detected
     resetCurrentDate();
     resetCurrentTime();
     bypassShowTime = true;
   }
-  updateMode('D');
+  updateMode('D'); // day mode is default
   lastUpdate = millis();
 }
 
@@ -1099,7 +1109,7 @@ void loop() {
   keypad.getKey();
 
   if (displayOn) {
-    if (millis() - lastUpdate >= 1000) {
+    if (millis() - lastUpdate >= 1000) { // refresh displayed time every second
       findMode();
       lastUpdate = millis();
     }
