@@ -189,7 +189,7 @@
 		(uuid "c1024714-cf53-4cf1-8257-00035a847d42")
 	)
 	(embedded_fonts no)
-	(model "C:/Users/AaronCrnkovic/Documents/KiCad/3D Models/Launch Clock/lc_10µF_tantalum.STEP"
+	(model "../../3dmodels/lc_10µF_tantalum.STEP"
 		(offset
 			(xyz 0 0 0)
 		)

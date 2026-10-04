@@ -508,7 +508,7 @@
 			(xyz -0 -0 -90)
 		)
 	)
-	(model "C:/Users/AaronCrnkovic/Documents/KiCad/3D Models/Launch Clock/5641AS.step"
+	(model "../../3dmodels/5641AS.step"
 		(offset
 			(xyz -25.3 -9.5 16.3)
 		)

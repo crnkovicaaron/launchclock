@@ -540,7 +540,7 @@
 			(xyz -0 -0 -90)
 		)
 	)
-	(model "C:/Users/AaronCrnkovic/Documents/KiCad/3D Models/Launch Clock/LED_1088.step"
+	(model "../../3dmodels/LED_1088.step"
 		(offset
 			(xyz -3.67 3.15 10.3)
 		)

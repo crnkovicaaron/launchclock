@@ -444,7 +444,7 @@
 		(uuid "89760b92-b5ab-4800-8130-c10cd7348778")
 	)
 	(embedded_fonts no)
-	(model "C:/Users/AaronCrnkovic/Documents/KiCad/3D Models/Launch Clock/lc_mcu_carriage.step"
+	(model "../../3dmodels/lc_mcu_carriage.step"
 		(offset
 			(xyz 0 0 -3.5)
 		)

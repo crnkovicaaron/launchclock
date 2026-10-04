@@ -503,7 +503,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "launch_clock_pcb_v3.kicad_pro",
+    "filename": "launch_clock_pcb_v3_demo.kicad_pro",
     "version": 3
   },
   "net_settings": {
@@ -751,8 +751,8 @@
     "subpart_id_separator": 0,
     "top_level_sheets": [
       {
-        "filename": "launch_clock_pcb_v3.kicad_sch",
-        "name": "Root",
+        "filename": "launch_clock_pcb_v3_demo.kicad_sch",
+        "name": "launch_clock_pcb_v3_demo",
         "uuid": "ea123b4c-d5af-4493-8dd6-42ad69b1b5b2"
       }
     ],

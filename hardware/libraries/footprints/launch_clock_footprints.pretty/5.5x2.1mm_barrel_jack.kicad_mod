@@ -239,7 +239,7 @@
 		(uuid "e17a1681-5cc2-4b8f-b5d0-925a7ea566fa")
 	)
 	(embedded_fonts no)
-	(model "C:/Users/AaronCrnkovic/Documents/KiCad/3D Models/Launch Clock/5.5x2.1mm_barrel_jack.step"
+	(model "../../3dmodels/5.5x2.1mm_barrel_jack.step"
 		(offset
 			(xyz 0 -0.35 0)
 		)

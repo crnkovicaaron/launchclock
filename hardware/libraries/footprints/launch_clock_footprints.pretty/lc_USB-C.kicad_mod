@@ -807,7 +807,7 @@
 		(uuid "ef026667-97d0-4baa-b2aa-788028e8bed2")
 	)
 	(embedded_fonts no)
-	(model "C:/Users/AaronCrnkovic/Documents/KiCad/3D Models/Launch Clock/lc_USB-C.stp"
+	(model "../../3dmodels/lc_USB-C.stp"
 		(offset
 			(xyz -0.5 -2.1 0.77)
 		)

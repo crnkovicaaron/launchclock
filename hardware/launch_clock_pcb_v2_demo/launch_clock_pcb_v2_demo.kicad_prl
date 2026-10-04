@@ -21,7 +21,7 @@
       "footprints": true,
       "graphics": true,
       "keepouts": true,
-      "lockedItems": true,
+      "lockedItems": false,
       "otherItems": true,
       "pads": true,
       "text": true,
@@ -53,7 +53,7 @@
       "board_outline_area",
       "ly_points"
     ],
-    "visible_layers": "ffffffff_ffffffff_ffffffff_7fffffff",
+    "visible_layers": "ffffffff_ffffffff_ffffffff_ffffffff",
     "zone_display_mode": 0
   },
   "git": {
@@ -63,7 +63,7 @@
     "ssh_key": ""
   },
   "meta": {
-    "filename": "launch_clock_pcb_v1.kicad_prl",
+    "filename": "launch_clock_pcb_v2.kicad_prl",
     "version": 5
   },
   "net_inspector_panel": {
@@ -92,16 +92,16 @@
       9
     ],
     "col_widths": [
-      243,
-      221,
-      137,
-      101,
-      137,
-      137,
-      137,
-      107,
-      137,
-      137
+      109,
+      125,
+      181,
+      145,
+      156,
+      185,
+      159,
+      154,
+      73,
+      75
     ],
     "custom_group_rules": [],
     "expanded_rows": [],

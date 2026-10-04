@@ -347,7 +347,7 @@
 		(uuid "bd552696-aeef-4464-9ded-40f2628e12a6")
 	)
 	(embedded_fonts no)
-	(model "C:/Users/AaronCrnkovic/Documents/KiCad/3D Models/Launch Clock/lc_USB-C_2.step"
+	(model "../../3dmodels/lc_USB-C_2.step"
 		(offset
 			(xyz 0 0 0)
 		)

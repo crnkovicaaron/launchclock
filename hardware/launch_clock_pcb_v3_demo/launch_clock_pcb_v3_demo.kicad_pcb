@@ -246,12 +246,6 @@
 		(path "/803ef4b7-2b18-489f-a85d-d1db234ebc50")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "2")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -295,6 +289,17 @@
 			(fill no)
 			(layer "F.Fab")
 			(uuid "dde54b13-c3cb-439f-a1a3-6aab3bc06c65")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 270)
+			(layer "F.Fab")
+			(uuid "b9b866f6-8f2f-4948-939b-a76d3cef3cfb")
+			(effects
+				(font
+					(size 0.4 0.4)
+					(thickness 0.06)
+				)
+			)
 		)
 		(pad "1" smd roundrect
 			(at -0.9125 0 270)
@@ -420,12 +425,6 @@
 		(path "/eea993a3-f2ee-4e1e-bb20-88495b82869a")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "2")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -469,6 +468,17 @@
 			(fill no)
 			(layer "F.Fab")
 			(uuid "67271e5b-bd86-428a-8133-04c6fa469388")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 270)
+			(layer "F.Fab")
+			(uuid "c20986c4-e46f-4186-a38b-58978f5122ce")
+			(effects
+				(font
+					(size 0.4 0.4)
+					(thickness 0.06)
+				)
+			)
 		)
 		(pad "1" smd roundrect
 			(at -0.9125 0 270)
@@ -594,12 +604,6 @@
 		(path "/2bd509f5-b873-400a-b495-af7c85129a02")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "2")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -643,6 +647,17 @@
 			(fill no)
 			(layer "F.Fab")
 			(uuid "881110ab-bdba-466a-bb5b-cb4cc59bdf13")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 270)
+			(layer "F.Fab")
+			(uuid "4b363e67-49cd-4b90-93da-7bb87daa4237")
+			(effects
+				(font
+					(size 0.4 0.4)
+					(thickness 0.06)
+				)
+			)
 		)
 		(pad "1" smd roundrect
 			(at -0.8625 0 270)
@@ -690,7 +705,7 @@
 				)
 			)
 		)
-		(property "Value" "lc_reset_button"
+		(property "Value" "SW_TS18-5-25-SL-260-SMT-TR"
 			(at 0 3.665 0)
 			(layer "F.Fab")
 			(hide yes)
@@ -779,12 +794,6 @@
 		(path "/7ad92c40-8dc4-4ee2-9919-13cba6aa99af")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "3" "4" "1" "2")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -966,7 +975,7 @@
 			(uuid "2274afb5-e1fa-4707-8991-7ea2a5cc0164")
 		)
 		(embedded_fonts no)
-		(model "C:/Users/AaronCrnkovic/Documents/KiCad/3D Models/Launch Clock/lc_reset_button.step"
+		(model "../../3dmodels/lc_reset_button.step"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -1064,12 +1073,6 @@
 		(path "/ebf8e0e3-d4fd-4534-a273-d0b1f3ba955e")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "7" "2" "8" "3" "9" "4" "10" "5" "11" "6" "12")
-			)
-		)
 		(attr through_hole)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -1372,6 +1375,40 @@
 			(layer "F.Fab")
 			(uuid "1b0b713e-56c6-4e41-9667-1aeeca303995")
 		)
+		(fp_text user "${REFERENCE}"
+			(at -0.06 -7.62 180)
+			(layer "F.Fab")
+			(uuid "d298a77d-ec04-4681-994c-25c83887283e")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(fp_text user "${REFERENCE}"
+			(at -0.03 7.62 180)
+			(layer "F.Fab")
+			(uuid "289fac82-330c-4085-9699-3b501c21f840")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 2.5 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(uuid "5df07d49-802b-4d2d-be77-1be80c964650")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
 		(pad "1" thru_hole rect
 			(at -6.41 -7.62 90)
 			(size 1.7 1.7)
@@ -1527,7 +1564,7 @@
 				(xyz -0 -0 -90)
 			)
 		)
-		(model "C:/Users/AaronCrnkovic/Documents/KiCad/3D Models/Launch Clock/5641AS.step"
+		(model "../../3dmodels/5641AS.step"
 			(offset
 				(xyz -25.3 -9.5 16.3)
 			)
@@ -1632,12 +1669,6 @@
 		(path "/2bc708a9-7ce0-463e-8c49-973bc1bedf42")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "2")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -1681,6 +1712,17 @@
 			(fill no)
 			(layer "F.Fab")
 			(uuid "95df92b2-3ccf-4378-a0e4-17580aa4176a")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "439ea51a-7201-4115-945f-20554e51ac41")
+			(effects
+				(font
+					(size 0.4 0.4)
+					(thickness 0.06)
+				)
+			)
 		)
 		(pad "1" smd roundrect
 			(at -0.9125 0)
@@ -1792,12 +1834,6 @@
 		(path "/61fa0e9f-8c07-4255-aec9-4f0efbe6d05f")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "2")
-			)
-		)
 		(attr through_hole)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -2006,7 +2042,7 @@
 			(uuid "b7d8a0d3-2ab8-4195-8b84-64fbc2217fa1")
 		)
 		(embedded_fonts no)
-		(model "C:/Users/AaronCrnkovic/Documents/KiCad/3D Models/Launch Clock/16MHz_resonator.step"
+		(model "../../3dmodels/16MHz_resonator.step"
 			(hide yes)
 			(offset
 				(xyz 0 0 0)
@@ -2018,7 +2054,7 @@
 				(xyz -90 -0 -0)
 			)
 		)
-		(model "C:/Users/AaronCrnkovic/Documents/KiCad/3D Models/Launch Clock/16MHz_resonator_rev.step"
+		(model "../../3dmodels/16MHz_resonator_rev.step"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -2116,14 +2152,6 @@
 		(path "/7c308352-8e3a-4e2c-8819-f74c1f65d0a5")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "16" "8" "15" "7" "14" "6" "13" "5" "12" "4" "11" "3" "10" "2"
-					"9" "1"
-				)
-			)
-		)
 		(attr through_hole)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -2426,6 +2454,40 @@
 			(layer "F.Fab")
 			(uuid "bf55b4c1-56fd-4fa9-a18c-86527240ab0b")
 		)
+		(fp_text user "${REFERENCE}"
+			(at -0.06 -12 0)
+			(layer "F.Fab")
+			(uuid "e1d749fc-a55a-4c44-ba29-24fdd043bc1b")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 1.5 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(uuid "c64c2a89-119f-4b71-8029-2f5d14e1aacd")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 12 0)
+			(layer "F.Fab")
+			(uuid "a5061967-e217-4908-9902-c2610150f25b")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
 		(pad "1" thru_hole rect
 			(at 8.89 12 270)
 			(size 1.7 1.7)
@@ -2625,7 +2687,7 @@
 				(xyz -0 -0 -90)
 			)
 		)
-		(model "C:/Users/AaronCrnkovic/Documents/KiCad/3D Models/Launch Clock/LED_1088.step"
+		(model "../../3dmodels/LED_1088.step"
 			(offset
 				(xyz -3.67 3.15 10.3)
 			)
@@ -2760,12 +2822,6 @@
 		(path "/0721b9e7-1e3d-4212-bbe4-8c2eec6bbb0e")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "2")
-			)
-		)
 		(attr through_hole)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -2962,6 +3018,17 @@
 			(layer "F.Fab")
 			(uuid "a2aa36df-c6f2-4476-b6d0-4a409329bb08")
 		)
+		(fp_text user "${REFERENCE}"
+			(at 9.525 0 270)
+			(layer "F.Fab")
+			(uuid "075bda2b-5ab9-4244-9e33-b1938bd820c5")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
 		(pad "1" thru_hole rect
 			(at 0 0 270)
 			(size 2.54 2.54)
@@ -3090,12 +3157,6 @@
 		(path "/7e0c698a-293a-45db-8a7f-d7ebe1a18792")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "2")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -3139,6 +3200,17 @@
 			(fill no)
 			(layer "F.Fab")
 			(uuid "f60f663c-0ab3-432c-a1b7-efe3f4abfd59")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 90)
+			(layer "F.Fab")
+			(uuid "0157bb69-e452-4f61-926d-134df81638a1")
+			(effects
+				(font
+					(size 0.4 0.4)
+					(thickness 0.06)
+				)
+			)
 		)
 		(pad "1" smd roundrect
 			(at -0.9125 0 90)
@@ -3238,12 +3310,6 @@
 		(path "/0f833e9b-a02c-49a5-972f-fe2ded05b83b")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "2")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -3287,6 +3353,17 @@
 			(fill no)
 			(layer "F.Fab")
 			(uuid "ea5b323c-c14a-41ab-bc54-f5e078b31a19")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 180)
+			(layer "F.Fab")
+			(uuid "ee06fd14-ad31-4de0-9410-4ff391df77e2")
+			(effects
+				(font
+					(size 0.4 0.4)
+					(thickness 0.06)
+				)
+			)
 		)
 		(pad "1" smd roundrect
 			(at -0.9125 0 180)
@@ -3399,12 +3476,6 @@
 		(path "/d2da4699-22d1-43ab-a2c0-e20639dffb08")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "3" "5" "2" "6" "4")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -3611,6 +3682,17 @@
 			(layer "F.Fab")
 			(uuid "f87b51c9-e68c-4dae-ab8f-94132537dcff")
 		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 270)
+			(layer "F.Fab")
+			(uuid "795e5b01-ded3-4da4-accb-b290a7a19732")
+			(effects
+				(font
+					(size 0.72 0.72)
+					(thickness 0.11)
+				)
+			)
+		)
 		(pad "1" smd roundrect
 			(at -1.1375 -0.95 180)
 			(size 1.325 0.6)
@@ -3777,12 +3859,6 @@
 		(path "/1e76f4b4-2556-4ec8-b462-0870f40715f8")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "2")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -3826,6 +3902,17 @@
 			(fill no)
 			(layer "F.Fab")
 			(uuid "fb39be55-e7a0-4992-8401-11376d623c48")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 180)
+			(layer "F.Fab")
+			(uuid "86f203c6-9058-4562-a43d-7db0cedd6138")
+			(effects
+				(font
+					(size 0.4 0.4)
+					(thickness 0.06)
+				)
+			)
 		)
 		(pad "1" smd roundrect
 			(at -0.8625 0 180)
@@ -3951,12 +4038,6 @@
 		(path "/4db1eec1-dc05-4145-a4cb-a4d9dd31f4e8")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "2")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -4000,6 +4081,17 @@
 			(fill no)
 			(layer "F.Fab")
 			(uuid "bcc3ecd1-d597-49c3-bebb-52c9d675f1b0")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 90)
+			(layer "F.Fab")
+			(uuid "07c110e1-d7ca-40f8-af8b-79791fa6af85")
+			(effects
+				(font
+					(size 0.4 0.4)
+					(thickness 0.06)
+				)
+			)
 		)
 		(pad "1" smd roundrect
 			(at -0.8625 0 90)
@@ -4125,12 +4217,6 @@
 		(path "/70909ccb-e646-4698-a27b-5bff78ffdc12")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "2")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -4174,6 +4260,17 @@
 			(fill no)
 			(layer "F.Fab")
 			(uuid "a03ae380-2c54-4dd6-9fa9-3e301b7ab1f3")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 270)
+			(layer "F.Fab")
+			(uuid "ff70acce-ff62-4b3c-a41c-3199ff480181")
+			(effects
+				(font
+					(size 0.4 0.4)
+					(thickness 0.06)
+				)
+			)
 		)
 		(pad "1" smd roundrect
 			(at -0.8625 0 270)
@@ -4299,12 +4396,6 @@
 		(path "/3b0605d2-9c30-4d74-b350-2e5338f5040c")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "2")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -4348,6 +4439,17 @@
 			(fill no)
 			(layer "F.Fab")
 			(uuid "4519585c-de79-4ee7-9481-ae38306a6ddd")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 270)
+			(layer "F.Fab")
+			(uuid "45feca6c-ae26-4204-aafd-97aabf4f29a4")
+			(effects
+				(font
+					(size 0.4 0.4)
+					(thickness 0.06)
+				)
+			)
 		)
 		(pad "1" smd roundrect
 			(at -0.9125 0 270)
@@ -4473,12 +4575,6 @@
 		(path "/2d07cd75-8a42-4833-8f9e-eb4572e97169")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "2")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -4522,6 +4618,17 @@
 			(fill no)
 			(layer "F.Fab")
 			(uuid "eb0dc9c2-4f92-4bec-b06d-229da4df0d65")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 90)
+			(layer "F.Fab")
+			(uuid "1187bb9e-b050-47bf-bfde-84065797764e")
+			(effects
+				(font
+					(size 0.4 0.4)
+					(thickness 0.06)
+				)
+			)
 		)
 		(pad "1" smd roundrect
 			(at -0.9125 0 90)
@@ -4647,12 +4754,6 @@
 		(path "/a548d54e-7dbf-4c77-91ca-884694022a9a")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "2")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -4696,6 +4797,17 @@
 			(fill no)
 			(layer "F.Fab")
 			(uuid "9b90b701-3c56-491b-b919-c150672bf6a5")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 180)
+			(layer "F.Fab")
+			(uuid "29954a60-6926-4e7d-8877-a69f9a60e89b")
+			(effects
+				(font
+					(size 0.4 0.4)
+					(thickness 0.06)
+				)
+			)
 		)
 		(pad "1" smd roundrect
 			(at -0.8625 0 180)
@@ -4795,14 +4907,6 @@
 		(path "/0e72301e-748b-4a38-9412-18e9449c77a5")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "18" "12" "13" "1" "19" "4" "9" "14" "16" "20" "23" "21" "15" "17"
-					"22" "2" "11" "6" "7" "3" "10" "5" "8" "24"
-				)
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -5008,6 +5112,17 @@
 			(fill no)
 			(layer "F.Fab")
 			(uuid "63bdf4fc-beca-4818-9185-4d5ca7ea12fc")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 90)
+			(layer "F.Fab")
+			(uuid "1743416f-4a64-4545-aaf1-819ea10ec6d3")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
 		)
 		(pad "1" smd roundrect
 			(at -4.65 -6.985 90)
@@ -5354,12 +5469,6 @@
 		(path "/85b16172-35ae-4067-97b6-003832f37c88")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "2" "3" "4" "5" "6")
-			)
-		)
 		(attr through_hole)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -5502,6 +5611,17 @@
 			)
 			(layer "F.Fab")
 			(uuid "8c3db7ca-c22c-4eee-97fb-0b33d060e740")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 1.27 2.54 180)
+			(layer "F.Fab")
+			(uuid "0f745ee3-dbd9-4169-be40-584a14874448")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
 		)
 		(pad "1" thru_hole rect
 			(at 0 0 90)
@@ -5682,6 +5802,17 @@
 				)
 			)
 		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "d03520e8-493d-45b9-847d-693494dd02f7")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
 		(pad "" np_thru_hole circle
 			(at 0 0)
 			(size 3.2 3.2)
@@ -5771,12 +5902,6 @@
 		(path "/c0431ef6-f6ff-4c81-ac1b-19578ff71bae")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "2")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -5820,6 +5945,17 @@
 			(fill no)
 			(layer "F.Fab")
 			(uuid "36d6995e-4c43-4bea-9a22-5fab0c272e92")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "a002f121-b8c6-452b-95d9-bc015eac0ae5")
+			(effects
+				(font
+					(size 0.4 0.4)
+					(thickness 0.06)
+				)
+			)
 		)
 		(pad "1" smd roundrect
 			(at -0.8625 0)
@@ -5919,14 +6055,6 @@
 		(path "/a99993b7-e16b-499d-8fca-d7488e782061")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "18" "12" "13" "1" "19" "4" "9" "14" "16" "20" "23" "21" "15" "17"
-					"22" "2" "11" "6" "7" "3" "10" "5" "8" "24"
-				)
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -6132,6 +6260,17 @@
 			(fill no)
 			(layer "F.Fab")
 			(uuid "12174849-96af-4ab0-a84b-6b16ffd9c614")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 90)
+			(layer "F.Fab")
+			(uuid "f240e548-05d8-48d8-b3ee-382275971ba0")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
 		)
 		(pad "1" smd roundrect
 			(at -4.65 -6.985 90)
@@ -6486,6 +6625,17 @@
 				)
 			)
 		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "844cf1f1-3b34-4ade-a2a6-ad64db253b67")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
 		(pad "" np_thru_hole circle
 			(at 0 0)
 			(size 3.2 3.2)
@@ -6575,12 +6725,6 @@
 		(path "/225096e4-5e8a-423d-8135-d106a1482de4")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "2")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -6624,6 +6768,17 @@
 			(fill no)
 			(layer "F.Fab")
 			(uuid "7d8d84db-7db7-4f8a-85ec-21b1885726ae")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 90)
+			(layer "F.Fab")
+			(uuid "fc57020c-5acc-49e5-b288-b38897c519a7")
+			(effects
+				(font
+					(size 0.8 0.8)
+					(thickness 0.12)
+				)
+			)
 		)
 		(pad "1" smd roundrect
 			(at -1.4875 0 90)
@@ -6736,15 +6891,6 @@
 		(path "/6627b20c-cb9d-45c6-b954-77d94bcf1b60")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "20" "19" "22" "4" "6" "3" "5" "21" "18" "12" "13" "14" "15" "16"
-					"17" "7" "8" "23" "24" "25" "26" "27" "28" "29" "30" "31" "32" "1" "2"
-					"9" "10" "11"
-				)
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -7050,6 +7196,17 @@
 			(fill no)
 			(layer "F.Fab")
 			(uuid "08db5567-74fa-4c90-a9dc-36569226351c")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 180)
+			(layer "F.Fab")
+			(uuid "dae4eafb-2360-4897-bf6d-6aff8f6470b7")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
 		)
 		(pad "1" smd roundrect
 			(at -4.1625 -2.8 180)
@@ -7470,12 +7627,6 @@
 		(path "/d4f1135c-3146-4a25-8ed3-9f6121dcfb21")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "7" "2" "8" "3" "9" "4" "10" "5" "11" "6" "12")
-			)
-		)
 		(attr through_hole)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -7778,6 +7929,40 @@
 			(layer "F.Fab")
 			(uuid "a8227549-a0b8-48db-9daf-fb33d9e03daa")
 		)
+		(fp_text user "${REFERENCE}"
+			(at -0.06 -7.62 180)
+			(layer "F.Fab")
+			(uuid "b92a020a-1977-46ea-9ecc-f8889b2c1079")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(fp_text user "${REFERENCE}"
+			(at -0.03 7.62 180)
+			(layer "F.Fab")
+			(uuid "2a27ea8d-2154-4a58-82ab-fbd41c75468c")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 2.5 0)
+			(unlocked yes)
+			(layer "F.Fab")
+			(uuid "85296d25-ea58-4f1e-9537-0a0fbf9e1739")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
 		(pad "1" thru_hole rect
 			(at -6.41 -7.62 90)
 			(size 1.7 1.7)
@@ -7933,7 +8118,7 @@
 				(xyz -0 -0 -90)
 			)
 		)
-		(model "C:/Users/AaronCrnkovic/Documents/KiCad/3D Models/Launch Clock/5641AS.step"
+		(model "../../3dmodels/5641AS.step"
 			(offset
 				(xyz -25.3 -9.5 16.3)
 			)
@@ -7960,7 +8145,7 @@
 				)
 			)
 		)
-		(property "Value" "lc_USB-C_2"
+		(property "Value" "SAMESKY_UJ20-C-H-G-SMT-1-P16-TR"
 			(at 14.435 -9.735 90)
 			(layer "F.Fab")
 			(hide yes)
@@ -8062,14 +8247,6 @@
 		(path "/2d1c2bc3-5f7b-429c-87fc-91cec857977e")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "A4_B9" "B4_A9" "A7" "A6" "B7" "B6" "A5" "A8" "B5" "B8" "A1_B12"
-					"B1_A12" "SH1" "SH2" "SH3" "SH4"
-				)
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -8223,6 +8400,17 @@
 			(fill no)
 			(layer "F.Fab")
 			(uuid "605e0a9d-31c4-43f3-9981-76587ec57d76")
+		)
+		(fp_text user "PCB EDGE"
+			(at 5.2 -0.2 90)
+			(layer "F.Fab")
+			(uuid "ab441e62-e975-4eed-9893-f8eb774fa8cb")
+			(effects
+				(font
+					(size 0.787402 0.787402)
+					(thickness 0.15)
+				)
+			)
 		)
 		(pad "" np_thru_hole circle
 			(at -2.89 -6.28 90)
@@ -8407,7 +8595,7 @@
 			(uuid "024679cb-8016-4f4b-a8bd-56e17f39d8a8")
 		)
 		(embedded_fonts no)
-		(model "C:/Users/AaronCrnkovic/Documents/KiCad/3D Models/Launch Clock/lc_USB-C_2.step"
+		(model "../../3dmodels/lc_USB-C_2.step"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -8512,12 +8700,6 @@
 		(path "/da8f00c3-d4bb-4822-b8ef-724b713843f3")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "2")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -8561,6 +8743,17 @@
 			(fill no)
 			(layer "F.Fab")
 			(uuid "3ef93205-c371-495c-859c-a671578c1a88")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "04cfc4e5-7214-4a46-9c0e-c5162b5f20ae")
+			(effects
+				(font
+					(size 0.4 0.4)
+					(thickness 0.06)
+				)
+			)
 		)
 		(pad "1" smd roundrect
 			(at -0.9125 0)
@@ -8673,12 +8866,6 @@
 		(path "/d6f16a77-2a23-45fc-95f9-6cf20a3d57ac")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "2")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -8722,6 +8909,17 @@
 			(fill no)
 			(layer "F.Fab")
 			(uuid "a78d7691-7d09-491e-9ae2-590e3f76da94")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 270)
+			(layer "F.Fab")
+			(uuid "d75b12f6-fa7c-400f-ba05-a3380715bf9b")
+			(effects
+				(font
+					(size 0.4 0.4)
+					(thickness 0.06)
+				)
+			)
 		)
 		(pad "1" smd roundrect
 			(at -0.9125 0 270)
@@ -8847,12 +9045,6 @@
 		(path "/c672978c-5eea-43e2-878e-a2dcfb7e99cd")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "2")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -8896,6 +9088,17 @@
 			(fill no)
 			(layer "F.Fab")
 			(uuid "99b7d879-f4f6-4437-8c54-e179d59e552f")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 270)
+			(layer "F.Fab")
+			(uuid "7b08f0b2-8fa0-4567-8e00-cdd2ebcceec7")
+			(effects
+				(font
+					(size 0.4 0.4)
+					(thickness 0.06)
+				)
+			)
 		)
 		(pad "1" smd roundrect
 			(at -0.9125 0 270)
@@ -8995,12 +9198,6 @@
 		(path "/c9d72353-cb86-486d-a97b-705863b8c8a3")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "2")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -9044,6 +9241,17 @@
 			(fill no)
 			(layer "F.Fab")
 			(uuid "47d6eb46-1a7a-45a3-8011-c462e4e0eceb")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 180)
+			(layer "F.Fab")
+			(uuid "f0df816a-3905-43a3-9271-57a4654279da")
+			(effects
+				(font
+					(size 0.4 0.4)
+					(thickness 0.06)
+				)
+			)
 		)
 		(pad "1" smd roundrect
 			(at -0.9125 0 180)
@@ -9169,12 +9377,6 @@
 		(path "/5ac1540c-014a-4270-a2e7-9761decc6a21")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "2" "3" "4" "5" "6" "7" "8")
-			)
-		)
 		(attr through_hole)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -9188,6 +9390,16 @@
 			(uuid "736c934e-b9af-4f41-9144-02efd1ca3c30")
 		)
 		(fp_line
+			(start 1.16 -0.43)
+			(end 1.39 -0.43)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "ea039af4-5047-43c3-9aab-527355b1712f")
+		)
+		(fp_line
 			(start -1.27 0)
 			(end -1.27 -1.27)
 			(stroke
@@ -9197,9 +9409,461 @@
 			(layer "F.SilkS")
 			(uuid "978f1f69-be23-4a65-8964-e53c1afb1818")
 		)
+		(fp_line
+			(start 1.16 0.43)
+			(end 1.39 0.43)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "f80ff43b-ff26-44cf-8e1e-cf8a89f38f2f")
+		)
+		(fp_line
+			(start 1.39 1.27)
+			(end 4.15 1.27)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "56276d78-7789-418b-8a05-76f044d9c4b7")
+		)
+		(fp_line
+			(start 10.15 2.11)
+			(end 10.15 2.97)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "e1d74c3d-544f-4b05-8740-45c3c36762ef")
+		)
+		(fp_line
+			(start 4.15 2.11)
+			(end 10.15 2.11)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "476d061c-76cb-47a1-af70-e6e39dd7c38c")
+		)
+		(fp_line
+			(start 1.077358 2.11)
+			(end 1.39 2.11)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "40ff7b85-0e1c-4682-8448-ae560d50f05a")
+		)
+		(fp_line
+			(start 10.15 2.97)
+			(end 4.15 2.97)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "5fb4437c-5bca-4dc7-9a96-7c4995ac1aa0")
+		)
+		(fp_line
+			(start 1.077358 2.97)
+			(end 1.39 2.97)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "57e8e5f7-0e56-42ca-85bc-39068dc95787")
+		)
+		(fp_line
+			(start 1.39 3.81)
+			(end 4.15 3.81)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "9db90edf-c661-4649-842c-a2653c24d2d0")
+		)
+		(fp_line
+			(start 10.15 4.65)
+			(end 10.15 5.51)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "72dd5c95-815e-4fe6-8193-28d29bf6bb7a")
+		)
+		(fp_line
+			(start 4.15 4.65)
+			(end 10.15 4.65)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "794de769-9217-406b-94ae-c25c1d85de0a")
+		)
+		(fp_line
+			(start 1.077358 4.65)
+			(end 1.39 4.65)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "cde22ee4-1b4c-42c4-abe9-41f709dd70dd")
+		)
+		(fp_line
+			(start 10.15 5.51)
+			(end 4.15 5.51)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "6d8fdb45-afab-47af-8835-1932a895c92b")
+		)
+		(fp_line
+			(start 1.077358 5.51)
+			(end 1.39 5.51)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "f8153e16-f1d0-4873-9b78-f3cbb82772cc")
+		)
+		(fp_line
+			(start 1.39 6.35)
+			(end 4.15 6.35)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "855cf331-c57c-436c-bc4b-75ed28146e95")
+		)
+		(fp_line
+			(start 10.15 7.19)
+			(end 10.15 8.05)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "dbc49d7e-ab72-464a-8a03-f838319bdf7f")
+		)
+		(fp_line
+			(start 4.15 7.19)
+			(end 10.15 7.19)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "af86f921-b1e3-43cc-b6f6-df22e347815d")
+		)
+		(fp_line
+			(start 1.077358 7.19)
+			(end 1.39 7.19)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "62fedfb0-f879-4ac4-a244-47019f5ee734")
+		)
+		(fp_line
+			(start 10.15 8.05)
+			(end 4.15 8.05)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "c110a208-7cc8-4629-9d78-be0083d32f23")
+		)
+		(fp_line
+			(start 1.077358 8.05)
+			(end 1.39 8.05)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "bdf83397-541b-414e-92c8-243d40a42d7e")
+		)
+		(fp_line
+			(start 1.39 8.89)
+			(end 4.15 8.89)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "d55fede3-6ead-4831-86f2-8d701c4aed2e")
+		)
+		(fp_line
+			(start 10.15 9.73)
+			(end 10.15 10.59)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "77ce243b-0446-447f-90f2-c7d5b101311d")
+		)
+		(fp_line
+			(start 4.15 9.73)
+			(end 10.15 9.73)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "180a5fd6-d277-4b20-b145-a8fc9cb818d1")
+		)
+		(fp_line
+			(start 1.077358 9.73)
+			(end 1.39 9.73)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "2994d746-bff4-4bcc-8eef-fbc76e876ecd")
+		)
+		(fp_line
+			(start 10.15 10.59)
+			(end 4.15 10.59)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "51a47ef9-dc0d-432b-b5c5-8776f0823bac")
+		)
+		(fp_line
+			(start 1.077358 10.59)
+			(end 1.39 10.59)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "7b2bde4b-14ea-4fea-ad0e-9c24cc827ce7")
+		)
+		(fp_line
+			(start 1.39 11.43)
+			(end 4.15 11.43)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "8891c581-b20f-43fa-93a3-5444bec3e94c")
+		)
+		(fp_line
+			(start 10.15 12.27)
+			(end 10.15 13.13)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "dd62829a-331d-42fc-9583-ca8a459ce748")
+		)
+		(fp_line
+			(start 4.15 12.27)
+			(end 10.15 12.27)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "6e11096b-7413-4fc8-8851-7ab9a011c7b3")
+		)
+		(fp_line
+			(start 1.077358 12.27)
+			(end 1.39 12.27)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "1514bb93-3a49-423c-b49f-e10f61d3cb8e")
+		)
+		(fp_line
+			(start 10.15 13.13)
+			(end 4.15 13.13)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "dded6273-552f-435e-ab8c-da2e79210975")
+		)
+		(fp_line
+			(start 1.077358 13.13)
+			(end 1.39 13.13)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "2ed4235c-0eab-4354-b127-ecfdb5687e0d")
+		)
+		(fp_line
+			(start 1.39 13.97)
+			(end 4.15 13.97)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "761c715f-eb35-48e2-a9fa-c3a7890a2bff")
+		)
+		(fp_line
+			(start 10.15 14.81)
+			(end 10.15 15.67)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "3f9d6843-7fc5-4e50-807b-fd0813ce1302")
+		)
+		(fp_line
+			(start 4.15 14.81)
+			(end 10.15 14.81)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "434a0344-6dbb-4a16-8fdc-15536d03e8c9")
+		)
+		(fp_line
+			(start 1.077358 14.81)
+			(end 1.39 14.81)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "b770b38a-0ab0-4842-9d29-c3daf9a55bff")
+		)
+		(fp_line
+			(start 10.15 15.67)
+			(end 4.15 15.67)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "8b96e169-e962-4983-8dbc-665826fb9385")
+		)
+		(fp_line
+			(start 1.077358 15.67)
+			(end 1.39 15.67)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "1152aeee-0051-49d9-88c7-c747e725f560")
+		)
+		(fp_line
+			(start 1.39 16.51)
+			(end 4.15 16.51)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "29b35531-b7c0-4526-817b-0185feae0df7")
+		)
+		(fp_line
+			(start 10.15 17.35)
+			(end 10.15 18.21)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "0c4bde0a-b598-418d-9737-57c8f555a369")
+		)
+		(fp_line
+			(start 4.15 17.35)
+			(end 10.15 17.35)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "d3e26023-480e-445f-b897-a58ac49a4a16")
+		)
+		(fp_line
+			(start 1.077358 17.35)
+			(end 1.39 17.35)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "9c91017f-e598-48fe-9a47-5283c1ed4402")
+		)
+		(fp_line
+			(start 10.15 18.21)
+			(end 4.15 18.21)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "c8a9adc2-9cca-4a9d-9cd7-808f4586f0ab")
+		)
+		(fp_line
+			(start 1.077358 18.21)
+			(end 1.39 18.21)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(layer "F.SilkS")
+			(uuid "d057cee6-1876-424e-b2a7-e78a0c7acca9")
+		)
+		(fp_rect
+			(start 1.39 -1.38)
+			(end 4.15 19.16)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(fill no)
+			(layer "F.SilkS")
+			(uuid "bc0c67fa-c8d9-40cc-8c15-c19549f0e86e")
+		)
+		(fp_rect
+			(start 4.15 -0.43)
+			(end 10.15 0.43)
+			(stroke
+				(width 0.12)
+				(type solid)
+			)
+			(fill yes)
+			(layer "F.SilkS")
+			(uuid "9fb169a3-e1b5-4d1d-80f1-f720698c9db8")
+		)
 		(fp_rect
 			(start -1.77 -1.77)
-			(end 1.75 19.55)
+			(end 10.54 19.55)
 			(stroke
 				(width 0.05)
 				(type solid)
@@ -9207,6 +9871,66 @@
 			(fill no)
 			(layer "F.CrtYd")
 			(uuid "47a755f5-6c3b-4dfb-947c-f6f01b9baa33")
+		)
+		(fp_line
+			(start 4.04 -1.27)
+			(end 4.04 19.05)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "bf388cb8-7378-45ff-9d7d-53d2a0559673")
+		)
+		(fp_line
+			(start 2.135 -1.27)
+			(end 4.04 -1.27)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "9aa9c941-beb6-435f-b8fe-433ab4dc3433")
+		)
+		(fp_line
+			(start 1.5 -0.635)
+			(end 2.135 -1.27)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "39c2791f-6f02-4d0b-914f-c1ff74019f7f")
+		)
+		(fp_line
+			(start 10.04 -0.32)
+			(end 10.04 0.32)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "9e71e6e9-4d2e-4901-a11c-40c62d950adf")
+		)
+		(fp_line
+			(start 4.04 -0.32)
+			(end 10.04 -0.32)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "37262be5-db62-4f71-8700-b9e41226adc7")
+		)
+		(fp_line
+			(start -0.32 -0.32)
+			(end 1.5 -0.32)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "51d5937a-a058-461a-b45f-362cd633a287")
 		)
 		(fp_line
 			(start -0.32 -0.32)
@@ -9219,6 +9943,56 @@
 			(uuid "5f4a2f00-aa72-4e74-8da4-3bbfa4714a15")
 		)
 		(fp_line
+			(start 4.04 0.32)
+			(end 10.04 0.32)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "8599a36f-1594-4426-b712-d46464718199")
+		)
+		(fp_line
+			(start -0.32 0.32)
+			(end 1.5 0.32)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "e7da9dcc-33b9-4074-b637-0da80a4a2a76")
+		)
+		(fp_line
+			(start 10.04 2.22)
+			(end 10.04 2.86)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "f738c60d-5a5c-4d6b-95f5-c75d8877d8b0")
+		)
+		(fp_line
+			(start 4.04 2.22)
+			(end 10.04 2.22)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "eb5d6eac-70ad-45fd-ad09-71bc3a9c22db")
+		)
+		(fp_line
+			(start -0.32 2.22)
+			(end 1.5 2.22)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "be5bd787-1a58-46a0-9a29-a5636b7515b4")
+		)
+		(fp_line
 			(start -0.32 2.22)
 			(end -0.32 2.86)
 			(stroke
@@ -9227,6 +10001,56 @@
 			)
 			(layer "F.Fab")
 			(uuid "0fc44000-daab-4e3d-90aa-bddee1e1bae3")
+		)
+		(fp_line
+			(start 4.04 2.86)
+			(end 10.04 2.86)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "5d3629d2-040b-40c4-af94-8297b317f9a3")
+		)
+		(fp_line
+			(start -0.32 2.86)
+			(end 1.5 2.86)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "5c77d071-df35-4543-aa07-a52961ae5454")
+		)
+		(fp_line
+			(start 10.04 4.76)
+			(end 10.04 5.4)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "e93679ff-1f5f-409a-984b-02d341bb5535")
+		)
+		(fp_line
+			(start 4.04 4.76)
+			(end 10.04 4.76)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "0a16325d-7559-42c3-8555-3bf122668fe6")
+		)
+		(fp_line
+			(start -0.32 4.76)
+			(end 1.5 4.76)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "801e43a8-9ef9-47cc-ad10-dd49ccc7cf4d")
 		)
 		(fp_line
 			(start -0.32 4.76)
@@ -9239,6 +10063,56 @@
 			(uuid "4ebbdc05-2176-4dd8-8428-9e65162f40c8")
 		)
 		(fp_line
+			(start 4.04 5.4)
+			(end 10.04 5.4)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "2476a7c4-df08-49c4-bf5c-b7b9782f48d4")
+		)
+		(fp_line
+			(start -0.32 5.4)
+			(end 1.5 5.4)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "d372168a-4dc8-459e-8183-4a00bc7a2237")
+		)
+		(fp_line
+			(start 10.04 7.3)
+			(end 10.04 7.94)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "7ba585e5-1f43-4f24-b648-ff956b3f90ac")
+		)
+		(fp_line
+			(start 4.04 7.3)
+			(end 10.04 7.3)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "18f8b4ba-93c0-4408-892b-4fe0d49f6566")
+		)
+		(fp_line
+			(start -0.32 7.3)
+			(end 1.5 7.3)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "b32be1b0-fd67-413a-89a4-9d953a0a9a3f")
+		)
+		(fp_line
 			(start -0.32 7.3)
 			(end -0.32 7.94)
 			(stroke
@@ -9247,6 +10121,56 @@
 			)
 			(layer "F.Fab")
 			(uuid "cd1cd1af-98db-48cb-9a79-cde94d0afbbe")
+		)
+		(fp_line
+			(start 4.04 7.94)
+			(end 10.04 7.94)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "e5d0d581-b4b2-4113-a778-284095a4e594")
+		)
+		(fp_line
+			(start -0.32 7.94)
+			(end 1.5 7.94)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "a1550660-bfe8-47e2-8881-aacc3f794ae3")
+		)
+		(fp_line
+			(start 10.04 9.84)
+			(end 10.04 10.48)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "b3b6495e-5ea0-4cea-9955-b0d58e3382fa")
+		)
+		(fp_line
+			(start 4.04 9.84)
+			(end 10.04 9.84)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "86a1d6a3-b848-446c-b20d-d8b20bac55ff")
+		)
+		(fp_line
+			(start -0.32 9.84)
+			(end 1.5 9.84)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "3ca97dd6-1407-4d53-a776-10a3042514fe")
 		)
 		(fp_line
 			(start -0.32 9.84)
@@ -9259,6 +10183,56 @@
 			(uuid "41420215-21a7-42ec-9078-0f031d162d25")
 		)
 		(fp_line
+			(start 4.04 10.48)
+			(end 10.04 10.48)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "4149b167-b600-4934-bfab-26d037fa5cbf")
+		)
+		(fp_line
+			(start -0.32 10.48)
+			(end 1.5 10.48)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "06219b53-1595-4750-a96d-d93f547a9c2e")
+		)
+		(fp_line
+			(start 10.04 12.38)
+			(end 10.04 13.02)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "5dd28dee-e1af-468d-8083-108b7305f083")
+		)
+		(fp_line
+			(start 4.04 12.38)
+			(end 10.04 12.38)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "c1cd46c3-1677-4753-b878-86c681c93be4")
+		)
+		(fp_line
+			(start -0.32 12.38)
+			(end 1.5 12.38)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "1cff98f8-0b28-4dcd-8ace-7ce5454f62a5")
+		)
+		(fp_line
 			(start -0.32 12.38)
 			(end -0.32 13.02)
 			(stroke
@@ -9267,6 +10241,56 @@
 			)
 			(layer "F.Fab")
 			(uuid "1d135083-63e2-4c11-abe3-ecf559790245")
+		)
+		(fp_line
+			(start 4.04 13.02)
+			(end 10.04 13.02)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "5fd28774-43b9-4aad-b4cd-0074704ead7d")
+		)
+		(fp_line
+			(start -0.32 13.02)
+			(end 1.5 13.02)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "848cfebe-fe90-4d2b-b5ec-fe18dda88534")
+		)
+		(fp_line
+			(start 10.04 14.92)
+			(end 10.04 15.56)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "ea8eef92-3e2e-44d0-affd-274d15e670ca")
+		)
+		(fp_line
+			(start 4.04 14.92)
+			(end 10.04 14.92)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "c1650bbc-ff02-46f0-b507-93c96212e430")
+		)
+		(fp_line
+			(start -0.32 14.92)
+			(end 1.5 14.92)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "ad8a2c3d-76e0-4148-a0f2-adfde4b4507d")
 		)
 		(fp_line
 			(start -0.32 14.92)
@@ -9279,6 +10303,56 @@
 			(uuid "e58ba46a-b9e0-4ce7-b661-0c32d579c994")
 		)
 		(fp_line
+			(start 4.04 15.56)
+			(end 10.04 15.56)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "33cb8dac-db66-4dab-9109-487ccc8debab")
+		)
+		(fp_line
+			(start -0.32 15.56)
+			(end 1.5 15.56)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "2cdad70d-2897-428c-b3e1-8e31b9321500")
+		)
+		(fp_line
+			(start 10.04 17.46)
+			(end 10.04 18.1)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "8eb811a3-258b-43ec-9ef7-46b2c1bbda34")
+		)
+		(fp_line
+			(start 4.04 17.46)
+			(end 10.04 17.46)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "a1fe9165-8b37-4a25-8376-6ba08152b11e")
+		)
+		(fp_line
+			(start -0.32 17.46)
+			(end 1.5 17.46)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "73acfd3f-7c91-4184-b8e6-32042f319e96")
+		)
+		(fp_line
 			(start -0.32 17.46)
 			(end -0.32 18.1)
 			(stroke
@@ -9287,6 +10361,57 @@
 			)
 			(layer "F.Fab")
 			(uuid "1b359bbc-8456-4a2e-8b95-00aaf034f749")
+		)
+		(fp_line
+			(start 4.04 18.1)
+			(end 10.04 18.1)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "75d027d1-f4a6-4d80-b393-3d4efc62bf6a")
+		)
+		(fp_line
+			(start -0.32 18.1)
+			(end 1.5 18.1)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "fe6dbda7-9fda-40b0-a264-7eff24fc6976")
+		)
+		(fp_line
+			(start 4.04 19.05)
+			(end 1.5 19.05)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "b09d669f-276f-4175-8340-53317608c084")
+		)
+		(fp_line
+			(start 1.5 19.05)
+			(end 1.5 -0.635)
+			(stroke
+				(width 0.1)
+				(type solid)
+			)
+			(layer "F.Fab")
+			(uuid "1e184119-28a1-4b71-8784-85500c0dd30a")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 2.77 8.89 180)
+			(layer "F.Fab")
+			(uuid "3555ea20-cf35-41a1-9d1c-5558eb8e2c63")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
 		)
 		(pad "1" thru_hole rect
 			(at 0 0 90)
@@ -9456,12 +10581,6 @@
 		(path "/3c23be91-9bf2-4c31-a8dd-83fc2f091688")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "2")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -9505,6 +10624,17 @@
 			(fill no)
 			(layer "F.Fab")
 			(uuid "391056be-0b55-4c60-a68e-996eb03d9a97")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "5a607453-84b5-4fc9-b665-b9e59fe6512d")
+			(effects
+				(font
+					(size 0.4 0.4)
+					(thickness 0.06)
+				)
+			)
 		)
 		(pad "1" smd roundrect
 			(at -0.9125 0)
@@ -9630,12 +10760,6 @@
 		(path "/ff4b3ba3-b87f-4381-9fef-5b3395b3f032")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "8" "7" "4" "6" "2" "5" "1" "3")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -9842,6 +10966,17 @@
 			(layer "F.Fab")
 			(uuid "9b470a40-b668-4364-92ff-5b29ce7092af")
 		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 90)
+			(layer "F.Fab")
+			(uuid "7f030e92-b1df-4ca8-b1d9-cf506423caaa")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
 		(pad "1" smd roundrect
 			(at -2.475 -1.905)
 			(size 1.95 0.6)
@@ -10015,14 +11150,6 @@
 		(path "/df40cd9a-0384-4bf6-86f7-e87d6c8ea146")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "9" "8" "4" "3" "10" "7" "6" "2" "25" "5" "16" "21" "20" "19" "18"
-					"22" "23" "24" "1" "17" "15" "14" "13" "12" "11"
-				)
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -10712,12 +11839,6 @@
 		(path "/d75dbc2d-6370-409b-8cea-c7f59a4c28f1")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "5" "4" "2" "1" "3")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -10974,6 +12095,17 @@
 			(layer "F.Fab")
 			(uuid "4e7584da-af80-43a3-8745-c265e273b67d")
 		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "20dc6213-43e0-403f-b994-a9fc77dc08f1")
+			(effects
+				(font
+					(size 0.72 0.72)
+					(thickness 0.11)
+				)
+			)
+		)
 		(pad "1" smd roundrect
 			(at -1.1375 -0.95 270)
 			(size 1.325 0.6)
@@ -11137,6 +12269,17 @@
 				)
 			)
 		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "9636453e-159e-4db4-b687-19c2ad3daa63")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
 		(pad "" np_thru_hole circle
 			(at 0 0)
 			(size 3.2 3.2)
@@ -11226,12 +12369,6 @@
 		(path "/fc6f3ae5-d13d-4146-8c99-78efcc78b8c6")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "2")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -11275,6 +12412,17 @@
 			(fill no)
 			(layer "F.Fab")
 			(uuid "c6bc47be-6858-40d8-9e17-2e2a907491f6")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 180)
+			(layer "F.Fab")
+			(uuid "a16c5347-b2c2-46fb-9e35-d868405331ac")
+			(effects
+				(font
+					(size 0.4 0.4)
+					(thickness 0.06)
+				)
+			)
 		)
 		(pad "1" smd roundrect
 			(at -0.8625 0 180)
@@ -11400,12 +12548,6 @@
 		(path "/19b286cc-5456-4357-96a8-51e87f9a67b7")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "2")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -11449,6 +12591,17 @@
 			(fill no)
 			(layer "F.Fab")
 			(uuid "bc178c8e-551d-4ced-afca-a36d0f8602f2")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 180)
+			(layer "F.Fab")
+			(uuid "99f70df0-b755-478a-bc5a-3848e87b9d6e")
+			(effects
+				(font
+					(size 0.4 0.4)
+					(thickness 0.06)
+				)
+			)
 		)
 		(pad "1" smd roundrect
 			(at -0.8625 0 180)
@@ -11574,12 +12727,6 @@
 		(path "/1534d250-2a73-40b4-a9ea-6af64d8a92c2")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "2")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -11623,6 +12770,17 @@
 			(fill no)
 			(layer "F.Fab")
 			(uuid "54c9af1e-6200-4057-969a-f2233863a88e")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 180)
+			(layer "F.Fab")
+			(uuid "8333a1bf-aa3a-4757-a2af-ddda5587a741")
+			(effects
+				(font
+					(size 0.4 0.4)
+					(thickness 0.06)
+				)
+			)
 		)
 		(pad "1" smd roundrect
 			(at -0.8625 0 180)
@@ -11755,6 +12913,17 @@
 				)
 			)
 		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 0)
+			(layer "F.Fab")
+			(uuid "c9ce1811-e47d-43a1-a878-ba21d641c019")
+			(effects
+				(font
+					(size 1 1)
+					(thickness 0.15)
+				)
+			)
+		)
 		(pad "" np_thru_hole circle
 			(at 0 0)
 			(size 3.2 3.2)
@@ -11857,12 +13026,6 @@
 		(path "/b55e5722-f593-4512-a133-8430c2afa10b")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "2")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -11906,6 +13069,17 @@
 			(fill no)
 			(layer "F.Fab")
 			(uuid "3dbbdd07-bbc2-43ea-a16d-455a648fc972")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 90)
+			(layer "F.Fab")
+			(uuid "be7d048c-2d5f-47e9-a4aa-150d27d332b4")
+			(effects
+				(font
+					(size 0.4 0.4)
+					(thickness 0.06)
+				)
+			)
 		)
 		(pad "1" smd roundrect
 			(at -0.9125 0 90)
@@ -12031,12 +13205,6 @@
 		(path "/2eab3134-8f0c-45dc-a7d5-004ac1bf6729")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "2")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -12080,6 +13248,17 @@
 			(fill no)
 			(layer "F.Fab")
 			(uuid "7e7cbb5c-2345-4147-a1ca-3a35b84314ca")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 270)
+			(layer "F.Fab")
+			(uuid "bfc1834a-100a-4be0-b56c-426864589d4c")
+			(effects
+				(font
+					(size 0.4 0.4)
+					(thickness 0.06)
+				)
+			)
 		)
 		(pad "1" smd roundrect
 			(at -0.8625 0 270)
@@ -12184,12 +13363,6 @@
 		(path "/6368e175-d7fc-4ddb-8d68-bdd12cc5eb03")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "2")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -12335,7 +13508,7 @@
 			(uuid "f0d2675b-1768-424e-baed-2d6ab3b9e1ea")
 		)
 		(embedded_fonts no)
-		(model "C:/Users/AaronCrnkovic/Documents/KiCad/3D Models/Launch Clock/lc_10µF_tantalum.STEP"
+		(model "../../3dmodels/lc_10µF_tantalum.STEP"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -12447,12 +13620,6 @@
 		(path "/6093cd96-57ae-4c4a-8b77-c30ad8bc3397")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "2")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -12496,6 +13663,18 @@
 			(fill no)
 			(layer "B.Fab")
 			(uuid "50371174-ea15-4886-86f1-122ddea8d73a")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 90)
+			(layer "B.Fab")
+			(uuid "e5d88455-5ee0-43a7-8a33-b0f589eb77c9")
+			(effects
+				(font
+					(size 0.4 0.4)
+					(thickness 0.06)
+				)
+				(justify mirror)
+			)
 		)
 		(pad "1" smd roundrect
 			(at -0.8625 0 270)
@@ -12600,12 +13779,6 @@
 		(path "/20ce4d2e-45fe-48ad-b7b4-6b00bacc450d")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "2")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -12751,7 +13924,7 @@
 			(uuid "85134806-5fdd-4eb2-87c7-f33a3088f6cd")
 		)
 		(embedded_fonts no)
-		(model "C:/Users/AaronCrnkovic/Documents/KiCad/3D Models/Launch Clock/lc_10µF_tantalum.STEP"
+		(model "../../3dmodels/lc_10µF_tantalum.STEP"
 			(offset
 				(xyz 0 0 0)
 			)
@@ -12863,12 +14036,6 @@
 		(path "/92a687e2-8497-4957-a3fa-347110ef016a")
 		(sheetname "/")
 		(sheetfile "launch_clock_pcb_v3x.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "2")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -12912,6 +14079,18 @@
 			(fill no)
 			(layer "B.Fab")
 			(uuid "4afaa87e-49c3-49c5-84fd-30ff3e253f48")
+		)
+		(fp_text user "${REFERENCE}"
+			(at 0 0 90)
+			(layer "B.Fab")
+			(uuid "feb5050e-f4b8-4175-a87c-8bde869d019d")
+			(effects
+				(font
+					(size 0.4 0.4)
+					(thickness 0.06)
+				)
+				(justify mirror)
+			)
 		)
 		(pad "1" smd roundrect
 			(at -0.8625 0 270)

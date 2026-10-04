@@ -220,7 +220,7 @@
 		(uuid "26946274-c2be-4c12-96d0-b1a4d030a8d2")
 	)
 	(embedded_fonts no)
-	(model "C:/Users/AaronCrnkovic/Documents/KiCad/3D Models/Launch Clock/lc_reset_button.step"
+	(model "../../3dmodels/lc_reset_button.step"
 		(offset
 			(xyz 0 0 0)
 		)
