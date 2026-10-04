@@ -4,6 +4,7 @@ It displays countdown and mission elapsed time, is controlled entirely using a k
 It is built around an ATmega328P microcontroller, DS3231 real-time clock, and MAX7219-driven 7-segment and dot matrix displays.
 
 ![Finished board photo](assets/lcv2_image.jpg)
+![Version 2 Box prototype](assets/lvc2_assembled.jpg)
 
 ## Features
 - LED Displays: 7-segment for time and dot matrix for mode/status glyphs
@@ -28,7 +29,8 @@ Key components:
 - **Assembly**: Hand soldered; uses both THD and SMD components
 - **Enclosure**: Custom 3D printed FreeCAD enclosure is WIP
 
-KiCad schematic and PCB files are under the 'hardware/' directory.
+KiCad schematic and PCB files are under the 'hardware/' directory. Assorted photos can be found under the 'assets/' directory.
+
 Status: Version 2 is completed and functional. Version 3 is WIP.
 
 ## Firmware
@@ -61,14 +63,17 @@ This revised prototype contains around a month of additions and improvements to 
 ### Version 1 PCB
 This custom 2-layer PCB mounts directly to an Arduino Mega using header pins, and the 7-segment displays mount to the board. With exception to the SMD resistors, there are essentially no changes to the circuit or its components between the revised prototype and the version 1 board. The main goal of this design was to become familiar with KiCad and PCB design.
 
+![Version 1 schematic](assets/lcv1_schematic.jpg)
 ![Version 1 image](assets/lcv1_image.jpg)
 
 ### Version 2 PCB
 The main goal of this version was to eliminate the Arduino and breakout boards by integrating all necessary functionality onto the board itself. This includes driving the 7-segment displays with a MAX7219 in the same manner as the dot matrix to allow the use of an MCU that is easier to solder by hand (instead of the ATmega2560 used on the Arduino Mega). The board is still 2-layers, programming is done via the ISP header, and numerous test points were integrated for troubleshooting and experimentation.
 
+![Version 2 schematic](assets/lcv2_schematic.jpg)
 ![Version 2 image](assets/lcv2_image.jpg)
 
 ### Version 3 PCB (Work in Progress)
 In this version, the barrel jack is superseded by a USB-C port with power and USB 2.0 data functionality. The MCU and display drivers use surface-mount packages in favor of through holes and most passive components are downsized to 0603 parts compared to the 1206 parts on version 2, allowing the total board area to be reduced by 28% compared to version 2. The board was designed to reduce EMI (mainly radiated), which includes switching to a 4-layer board. The revision also addresses numerous smaller issues with the version 2 board, including a soft but audible whine.
 
+![Version 3 schematic](assets/lcv3_schematic.jpg)
 ![Version 3 KiCad render](assets/lcv3_model.jpg)
