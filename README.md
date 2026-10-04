@@ -1,5 +1,5 @@
 # Rocket Launch Countdown Clock
-A fully standalone digital countdown clock for rocket launches.
+A standalone digital countdown clock for rocket launches.
 It displays countdown and mission elapsed time, is controlled entirely using a keypad, and requires no external computer or network.
 It is built around an ATmega328P microcontroller, DS3231 real-time clock, and MAX7219-driven 7-segment and dot matrix displays.
 
@@ -22,19 +22,20 @@ Key components:
 - **MCU**: ATmega328P
 - **RTC**: DS3231M with CR1220 battery backup
 - **Displays**: MAX7219-driven dual 4-digit 7-segment (5641AS) and 8x8 dot matrix (1088AS)
-- **INPUT**: 4x4 matrix keypad
+- **Input**: 4x4 matrix keypad
 - **Power**: 5V DC via 5.5x2.1mm barrel jack (or solder pads to enclosure-mounted barrel jack)
 - **Communication**: I²C (RTC) and SPI (display drivers & ISP)
 - **Assembly**: Hand soldered; uses both THD and SMD components
 - **Enclosure**: Custom 3D printed FreeCAD enclosure is WIP
 
 KiCad schematic and PCB files are under the 'hardware/' directory.
-Status: Version 2 is completed and funtional. Version 3 is WIP.
+Status: Version 2 is completed and functional. Version 3 is WIP.
 
 ## Firmware
 Written in Arduino C++ (AVR) for the ATmega328P (Arduino Uno).
 
-The firmware implements a keypad-driven state machine that manages countdown/MET display, time/date setting, pause, brightness, sleep, and error handling.  
+The firmware implements a keypad-driven state machine that manages countdown/MET display, time/date setting, pause, brightness, sleep, and error handling.
+
 Key elements:
 
 - **Libraries**: RTClib (DS3231), Keypad, LedControl (MAX7219), EEPROM, plus AVR sleep/power utilities
@@ -53,7 +54,7 @@ This Arduino breadboard prototype was an MVP with the singular goal of counting 
 ![Initial prototype photo](assets/lcv0-0_image.jpg)
 
 ### Revised Prototype
-This revised prototype contains around a month of additions and improvements to the initial prototype. These include the addition of keypad inputs (out of frame), a dot matrix display, and corrected/improved display wiring. The vast majority of the time since initial prototype was spent programming the firmware.
+This revised prototype contains around a month of additions and improvements to the initial prototype. These include the addition of keypad inputs (out of frame), a dot matrix display, and corrected/improved display wiring. The vast majority of the time since the initial prototype was spent programming the firmware.
 
 ![Revised prototype photo](assets/lcv0-1_image.jpg)
 
@@ -68,6 +69,6 @@ The main goal of this version was to eliminate the Arduino and breakout boards b
 ![Version 2 image](assets/lcv2_image.jpg)
 
 ### Version 3 PCB (Work in Progress)
-In this version, the barrel jack is superseded by a USB-C port with power and USB 2.0 data functionality. The MCU and display drivers use surface-mount packages in favor of through holes and most passive components are downsized to 0603 parts compared to the 1206 parts on version 2, allowing the total board area to be reduced by 28% compared to version 2. The board was designed to reduce EMI (mainly radiated), which includes switching a 4-layer board. The revision also addresses numerous smaller issues with the version 2 board, including a soft but audible whine.
+In this version, the barrel jack is superseded by a USB-C port with power and USB 2.0 data functionality. The MCU and display drivers use surface-mount packages in favor of through holes and most passive components are downsized to 0603 parts compared to the 1206 parts on version 2, allowing the total board area to be reduced by 28% compared to version 2. The board was designed to reduce EMI (mainly radiated), which includes switching to a 4-layer board. The revision also addresses numerous smaller issues with the version 2 board, including a soft but audible whine.
 
 ![Version 3 KiCad render](assets/lcv3_model.jpg)
